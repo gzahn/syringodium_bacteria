@@ -2,11 +2,11 @@
 
 This codebase is part of the **Microbiome Boot Camp** course at Utah Valley University. 
 
-![./media/syringodium_wikimedia.jpeg]
+![./media/syringodium_wikimedia.jpeg](./media/syringodium_wikimedia.jpeg)
 
 -- *Syringodium isoetifolium* meadow (Wiki commons)
 
-![./media/study_area.png]
+![./media/study_area.png](./media/study_area.png)
 
 -- Study area, colors denote location as West or East of Wallace's Line
 

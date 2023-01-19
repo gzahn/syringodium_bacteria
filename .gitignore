@@ -1,7 +1,7 @@
 # intermediate data
-./data/fintN/
-./data/cutadapt/
-./data/filtered/
+./data/fintN/*
+./data/cutadapt/*
+./data/filtered/*
 
 # History files
 .Rhistory

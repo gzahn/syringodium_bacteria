@@ -166,4 +166,4 @@ plot_bar2 <- function (physeq, x = "Sample", y = "Abundance", fill = NULL,
   return(p)
 }
 
-
+'%ni%' <- Negate('%in%')

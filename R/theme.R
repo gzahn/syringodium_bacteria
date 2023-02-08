@@ -1,6 +1,6 @@
 library(tidyverse)
-library(imgpalr)
-library(colorblindr) # https://github.com/clauswilke/colorblindr
+# library(imgpalr)
+# library(colorblindr) # https://github.com/clauswilke/colorblindr
 
 # pal.discrete <- 
 #   imgpalr::image_pal(file="./media/palletepics.png",
@@ -12,8 +12,8 @@ library(colorblindr) # https://github.com/clauswilke/colorblindr
 #                    seed = 123)
 
 pal.discrete <- 
-  c("#13600E","#2A5C12","#10411D","#219CAE","#5A5F13",
-    "#057BCC","#944F1C","#41132D","#793025","#172543","#7B681E","#1B554C")
+  c("#41132D","#944F1C","#13600E","#2A5C12","#10411D","#5A5F13",
+    "#057BCC","#793025","#219CAE","#172543","#7B681E","#1B554C")
 
 # palette_plot(pal.discrete) %>% 
 #   cvd_grid()

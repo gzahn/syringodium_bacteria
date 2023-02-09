@@ -39,13 +39,13 @@ displayAllColors(m_palette)
 mat <- matrix(1:81, nrow = 9, ncol = 9)
 
 mat1 <- melt(t(mat[9:1, ]))
-len <- length(y)
+len <- length(m_palette)
 mat1$v2 <- cut(mat1$value,
                breaks = seq(0,ceiling(81/len)*len, 
                             length.out = len+1))
 ht <- ggplot(mat1) + 
   geom_tile(aes(x=Var1, y=Var2, fill=v2)) + 
-  scale_fill_manual(values=y) + 
+  scale_fill_manual(values=m_palette) + 
   theme_bw()
 # check the plot by CVD simulator
 cvdPlot(ht)

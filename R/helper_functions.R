@@ -68,7 +68,7 @@ multi_bbdml <-
 
 ##############################
 
-
+# helper function for plotting multiple bbdml hits
 plot_multi_bbdml <- 
   function(bbdml_list,color="none",obj_basename="bbdml_plot_",pointsize=1,whichtaxa=1:length(bbdml_list)){
     
@@ -149,7 +149,7 @@ plot_multi_bbdml <-
 #   plot_multi_bbdml(color="FireTreatment",pointsize=3)
 # 
 
-
+# phyloseq barplot without internal black lines
 plot_bar2 <- function (physeq, x = "Sample", y = "Abundance", fill = NULL, 
                        title = NULL, facet_grid = NULL,width = 0.9) 
 {
@@ -166,4 +166,5 @@ plot_bar2 <- function (physeq, x = "Sample", y = "Abundance", fill = NULL,
   return(p)
 }
 
+# 'not-in' operator
 '%ni%' <- Negate('%in%')

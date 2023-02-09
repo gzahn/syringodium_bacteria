@@ -29,14 +29,14 @@ ps <- readRDS("./output/ps_not-cleaned_w_tree.RDS") # change to non-phylogeny st
 ps_nonbact <- subset_taxa(ps, Kingdom != "Bacteria")
 
 # quick plot to look at kingdom-level taxonomy
-ps %>% transform_sample_counts(function(x){x/sum(x)}) %>%
-  plot_bar(fill="Kingdom")
-ggsave("./output/figs/16S_Kingdom-Level_Taxonomic_Proportions.png",dpi=300) # save figure for later use
+# ps %>% transform_sample_counts(function(x){x/sum(x)}) %>%
+#   plot_bar(fill="Kingdom")
+# ggsave("./output/figs/16S_Kingdom-Level_Taxonomic_Proportions.png",dpi=300) # save figure for later use
 
 # same plot, but non-bacteria, for sanity check
-ps_nonbact %>% 
-  transform_sample_counts(function(x){x/sum(x)}) %>%
-  plot_bar(fill="Kingdom")
+# ps_nonbact %>% 
+#   transform_sample_counts(function(x){x/sum(x)}) %>%
+#   plot_bar(fill="Kingdom")
 
 
 # REMOVE NON-BACTERIA, CHLOROPLASTS, MITOCHONDRIA, and empty samples/taxa ####
@@ -51,6 +51,13 @@ ps <- subset_samples(ps, sample_sums(ps) > 0)
 seqs <- taxa_names(ps)
 seqs <- DNAStringSet(seqs)
 saveRDS(seqs,"./output/16S_ASV_reference_sequences.RDS")
+
+
+# double-check metadata
+
+# Bangka has both east and west?
+bad_bangka <- which(ps@sam_data$east_west == "West" & ps@sam_data$location == "Bangka")
+ps@sam_data$east_west[bad_bangka] <- "East" # fix it
 
 # Save RDS object for cleaned up Phyloseq object
 saveRDS(ps, file = "./output/clean_phyloseq_object.RDS")

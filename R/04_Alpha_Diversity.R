@@ -18,6 +18,9 @@ library(broom); packageVersion("broom")
 source("./R/helper_functions.R")
 source("./R/theme.R")
 
+#options
+options(scipen=999)
+
 # data
 ps <- readRDS("./output/clean_phyloseq_object.RDS")
 
@@ -70,5 +73,35 @@ sink(NULL)
 report::report(mod_observed)
 
 
+# Merge at location level ####
+
+ps@sam_data$newvar <- 
+paste(
+  ps@sam_data$location,
+  ps@sam_data$east_west,
+  sep="_"
+)
 
 
+ps_island <- 
+merge_samples(ps, "newvar", fun = sum)
+ps_island@sam_data
+# repair metadata using sample_names
+x <- sample_names(ps_island) %>% str_split("_")
+
+ps_island@sam_data$location <- 
+x %>% 
+  map_chr(1)
+
+ps_island@sam_data$east_west <- 
+  x %>% 
+  map_chr(2)
+
+ps_island@sam_data$east_west <- 
+ps_island@sam_data$east_west %>% factor(levels=c("West","East"))
+
+ps_island %>% 
+  tax_glom(taxrank = "Phylum") %>% 
+  transform_sample_counts(function(x){x/sum(x)}) %>% 
+  plot_heatmap(taxa.label = "Phylum",sample.label = "location") + 
+  facet_wrap(~east_west,scales = "free_x")

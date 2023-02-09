@@ -45,9 +45,9 @@ m_palette <-c("#40B0A0", "#EC6508", "#7715A3", "#0464DB", "#029AA0", "#0D6963",
 #mat1 <- melt(t(mat[9:1, ]))
 #len <- length(y)
 #mat1$v2 <- cut(mat1$value,
-               breaks = seq(0,ceiling(81/len)*len, 
-                            length.out = len+1))
-#ht <- ggplot(mat1) + 
+#                breaks = seq(0,ceiling(81/len)*len, 
+#                             length.out = len+1))
+# #ht <- ggplot(mat1) + 
 #  geom_tile(aes(x=Var1, y=Var2, fill=v2)) + 
 #  scale_fill_manual(values=y) + 
 #  theme_bw()

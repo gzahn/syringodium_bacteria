@@ -1,4 +1,18 @@
-# Beta-Diversity
+# -----------------------------------------------------------------------------#
+# Syringodium isoetifolium network analyses
+# Exploring network connectivity
+# Author: Geoffrey Zahn
+# Software versions:  R v 4.2.2
+#                     tidyverse v 1.3.2
+#                     vegan v 2.6.4
+#                     phyloseq v 1.42.0
+#                     ggraph v 2.1.0
+#                     ggmap v 3.0.1
+# -----------------------------------------------------------------------------#
+
+# SETUP ####
+
+# Packages
 library(tidyverse); packageVersion("tidyverse")
 library(vegan); packageVersion("vegan")
 library(phyloseq); packageVersion("phyloseq")
@@ -6,21 +20,27 @@ library(ggraph); packageVersion("ggraph")
 library(ggmap); packageVersion("ggmap")
 readRenviron("~/.Renviron")
 
+# functions
 source("./R/helper_functions.R")
 source("./R/theme.R")
 source("./R/googlemap_styling.R")
 
-ps <- readRDS("./output/clean_phyloseq_object.RDS")
-
 # Load google maps API key from .Renviron and set map style
 ggmap::register_google(key = Sys.getenv("export APIKEY")) # Key kept private
-mapstyle = 'feature:all|element:labels|visibility:off&style=feature:water|element:labels|visibility:on&style=feature:road|visibility:off'
+mapstyle <- rjson::fromJSON(file = "./R/mapstyle2.json") %>% # from JSON file exported from snazzymaps.com
+  googlemap_json_to_string(.)
 
-# network analysis
+
+# DATA ####
+ps <- readRDS("./output/clean_phyloseq_object.RDS")
+
+
+# MAKE NETWORK ####
 net <- make_network(ps %>% 
                     transform_sample_counts(function(x){x/sum(x)}),
                     keep.isolates = TRUE,max.dist = .5,distance = "bray")
 
+# PLOT NETWORK ####
 plot_network(g = net,
              physeq = ps,
              color = "east_west",
@@ -84,11 +104,7 @@ ggraph::ggraph(lay) +
   ggraph::geom_edge_link(aes(width=as.numeric(relative_weight/2)),data = lay_plot,width=1) +
   ggraph::geom_node_point(aes(color=east_west),size=3)
 
-
-
-mapstyle <- rjson::fromJSON(file = "./R/mapstyle2.json") %>% # from JSON file exported from snazzymaps.com
-  googlemap_json_to_string(.)
-
+# PLOT NETWORK ON MAP ####
 area <- 
   ggmap::get_googlemap(center = c(lon = ps@sam_data$lon %>% mean, 
                      lat = ps@sam_data$lat %>% mean),

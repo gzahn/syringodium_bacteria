@@ -10,15 +10,15 @@
 # -----------------------------------------------------------------------------#
 
 
-# Distance decay
 
+# SETUP ####
 library(tidyverse); packageVersion("tidyverse")
 library(vegan); packageVersion("vegan")
 library(phyloseq); packageVersion("phyloseq")
 library(ecodist); packageVersion("ecodist")
 library(geodist); packageVersion("geodist")
 
-# load data
+# DATA ####
 ps <- readRDS("./output/clean_phyloseq_object.RDS") %>% 
   transform_sample_counts(function(x){x/sum(x)})
 
@@ -30,9 +30,11 @@ meta <- ps@sam_data %>% as("data.frame")
 class(meta)
 
 
+# BRAY DISTANCE ####
 # bray-curtis community distance matrix 
 asv_dist <- vegdist(otu,method = "bray")
 
+# SPATIAL DISTANCE ####
 # lat-lon distance matrix
 # nominal "distance" 
 gps_dist <- vegdist(meta %>% select(lat,lon),
@@ -41,6 +43,7 @@ gps_dist <- vegdist(meta %>% select(lat,lon),
 # same thing, but in meters
 haversine_dist <- geodist(meta %>% select(lon,lat),measure = "geodesic") %>% as.dist()
 
+# MRM ####
 # Multiple regression on matrices
 mrm <- MRM(asv_dist ~ gps_dist, nperm = 1000)
 mrm_haversine <- MRM(asv_dist ~ haversine_dist,nperm=1000)
@@ -54,7 +57,7 @@ data.frame(haversine = haversine_dist %>% as.matrix() %>% c(),
   labs(y="Community distance",x="Haversine distance (m)")
 ggsave("./output/figs/comm_dist_vs_spatial_dist.png",dpi=300,height=4,width = 4)
 
-# Mantel test ####
+# MANTEL ####
 mant <- mantel(asv_dist,haversine_dist)
 mant
 

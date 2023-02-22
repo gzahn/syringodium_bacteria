@@ -30,15 +30,6 @@ meta <- ps@sam_data %>% as("data.frame")
 class(meta)
 
 
-# multipe regression on matrices ####
-?MRM
-
-# # examples
-# data(graze)
-# dist(graze$LOAR10)
-# # Abundance of this grass is related to forest cover but not location
-# MRM(dist(LOAR10) ~ dist(sitelocation) + dist(forestpct), data=graze, nperm=100)
-
 # bray-curtis community distance matrix 
 asv_dist <- vegdist(otu,method = "bray")
 
@@ -59,7 +50,9 @@ data.frame(haversine = haversine_dist %>% as.matrix() %>% c(),
            asv = asv_dist %>% as.matrix() %>% c()) %>% 
   ggplot(aes(x=haversine,y=asv)) +
   geom_point() +
-  geom_smooth(se=FALSE)
+  geom_smooth(se=FALSE) +
+  labs(y="Community distance",x="Haversine distance (m)")
+ggsave("./output/figs/comm_dist_vs_spatial_dist.png",dpi=300,height=4,width = 4)
 
 # Mantel test ####
 mant <- mantel(asv_dist,haversine_dist)

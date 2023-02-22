@@ -139,7 +139,7 @@ for(i in plots){
 }
 
 # reload objects (to avoid having to run plot_multi_bbdml() again)
-# plotfiles <- list.files("./output/figs",pattern = "bbdml_plot_")
+# plotfiles <- list.files("./output/figs",pattern = "bbdml_plot_",full.names = TRUE)
 # for(i in plotfiles){
 #   bn <- base::basename(i) %>% str_remove(".RDS")
 #   x <- readRDS(i)

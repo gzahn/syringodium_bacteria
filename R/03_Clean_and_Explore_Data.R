@@ -137,7 +137,7 @@ area2 <-
                        lat = ps@sam_data$lat %>% mean),
           zoom = 5,
           scale = 2,
-          style=mapstyle3)
+          style=mapstyle)
 ggmap::ggmap(area2) 
 
 
@@ -156,3 +156,4 @@ ggmap::ggmap(area2) +
        caption = paste0("Population groupings based on ",
                         gt %>% select(-name) %>% ncol(),
                         " microsatellite markers."))
+ggsave("./output/figs/host_population_structure_map.png",dpi=300,height = 6, width = 6)

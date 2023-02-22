@@ -1,0 +1,27 @@
+[1] "Bray distance"
+Permutation test for adonis under reduced model
+Terms added sequentially (first to last)
+Permutation: free
+Number of permutations: 999
+
+vegan::adonis2(formula = ps %>% transform_sample_counts(function(x) {
+                       Df SumOfSqs      R2      F Pr(>F)    
+ps@sam_data$east_west   1    5.452 0.09273 19.419  0.001 ***
+Residual              190   53.342 0.90727                  
+Total                 191   58.794 1.00000                  
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+[1] "Unifrac distance"
+Permutation test for adonis under reduced model
+Terms added sequentially (first to last)
+Permutation: free
+Number of permutations: 999
+
+adonis2(formula = UF ~ ps@sam_data$east_west + ps@sam_data$location)
+                       Df SumOfSqs      R2      F Pr(>F)    
+ps@sam_data$east_west   1   1.3604 0.13001 51.945  0.001 ***
+ps@sam_data$location   10   4.3897 0.41949 16.761  0.001 ***
+Residual              180   4.7142 0.45050                  
+Total                 191  10.4643 1.00000                  
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1

@@ -7,6 +7,9 @@
 #                     vegan v 2.6.4
 #                     phyloseq v 1.42.0
 #                     broom v 1.0.3
+#                     patchwork v 1.1.2
+#                     geodist v 0.0.8
+#                     broom v 1.0.3
 # -----------------------------------------------------------------------------#
 
 # SETUP ####
@@ -16,7 +19,11 @@ library(tidyverse); packageVersion("tidyverse")
 library(vegan); packageVersion("vegan")
 library(phyloseq); packageVersion("phyloseq")
 library(patchwork); packageVersion("patchwork")
-library(geodist): packageVersion("geodist")
+library(geodist); packageVersion("geodist")
+library(broom); packageVersion("broom")
+
+# seed
+set.seed(061223)
 
 # data
 ps <- readRDS("./output/clean_phyloseq_object.RDS")
@@ -43,7 +50,6 @@ plot_ordination(ps,NMDS,color="lon")
 
 # Unifrac distance
 # calculate weighted unifrac distance
-set.seed(061223)
 UF <- UniFrac(ps %>% 
                 transform_sample_counts(function(x){x/sum(x)}),
               weighted=TRUE)
@@ -62,6 +68,24 @@ unifrac_plot <- plot_ordination(ps,UFORD,color = "east_west") +
 bray_plot + unifrac_plot
 
 # PERMANOVA ####
+
+# specify model tables for Supplementary Info
+vegan::adonis2(ps %>% 
+                 transform_sample_counts(function(x){x/sum(x)}) %>% 
+                 otu_table() ~ ps@sam_data$east_west + ps@sam_data$location) %>% broom::tidy() %>% 
+  saveRDS("./output/bray_betadiv_df.RDS")
+adonis2(UF ~ ps@sam_data$east_west + ps@sam_data$location) %>% broom::tidy() %>% 
+  saveRDS("./output/unifrac_betadiv_df.RDS")
+
+# beta-dispersion
+bray <- ps %>% 
+  transform_sample_counts(function(x){x/sum(x)}) %>%
+  otu_table() %>% 
+  vegdist()
+vegan::betadisper(UF,ps@sam_data$east_west,type = 'centroid') %>% 
+  saveRDS("./output/beta_dispersion_unifrac.RDS")
+
+
 
 # send permanova results to text tables
 sink("./output/permanova_tables.txt")

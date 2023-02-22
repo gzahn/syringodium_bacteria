@@ -1,0 +1,149 @@
+---
+title: "Supporting Tables"
+output: 
+  html_document:
+    toc: yes
+    toc_depth: 1
+    toc_float:
+      collapsed: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE,warning = FALSE,message = FALSE)
+library(tidyverse)
+library(vegan)
+library(kableExtra)
+```
+
+<br>
+
+___
+
+<br>
+
+# Alpha-Diversity
+
+```{r}
+shannon <- readRDS("./shannon_div_df.RDS") %>% 
+  mutate(term = term %>% str_remove("island"),
+         term = term %>% str_remove("West"))
+
+
+shannon %>% 
+  kable(caption = "SI Table 1. Shannon Diversity GLM. Bold indicates P-value less than 0.05") %>% 
+  kable_classic(lightable_options = 'striped') %>% 
+  row_spec(which(shannon$p.value < 0.05), bold = TRUE)
+```
+
+
+<br>
+
+___
+
+<br>
+
+# Beta-Diversity 
+
+### PermANOVA Tables:
+
+```{r}
+bray_beta <- readRDS("../output/bray_betadiv_df.RDS") %>% 
+  mutate(term = term %>% str_remove("ps\\@sam_data\\$"))
+unifrac_beta <- readRDS("../output/unifrac_betadiv_df.RDS") %>% 
+    mutate(term = term %>% str_remove("ps\\@sam_data\\$"))
+
+```
+
+#### Bray-Curtis Distance
+
+```{r}
+bray_beta %>% 
+  kable(caption = "SI Table 2. Bray-Curtis PermANOVA. Bold indicates P-value less than 0.05") %>% 
+  kable_classic(lightable_options = 'striped') %>% 
+  row_spec(which(bray_beta$p.value < 0.05), bold = TRUE)
+```
+
+<br>
+
+#### UniFrac Distance
+
+```{r}
+unifrac_beta %>% 
+  kable(caption = "SI Table 3. UniFrac PermANOVA. Bold indicates P-value less than 0.05") %>% 
+  kable_classic(lightable_options = 'striped') %>% 
+  row_spec(which(unifrac_beta$p.value < 0.05), bold = TRUE)
+```
+
+___
+
+### Beta dispersion:
+
+```{r}
+betadisp <- readRDS("../output/beta_dispersion_unifrac.RDS")
+betadisp$call
+data.frame(
+  dists=betadisp$distances,
+  group = betadisp$group
+) %>% 
+  group_by(group) %>% 
+  summarize(mean = mean(dists),
+            sd = sd(dists)) %>% 
+  mutate(across(where(is.numeric),function(x){round(x,4)})) %>% 
+  kable(caption = "Table 4. Distance to centroid summaries for beta-dispersion.") %>% 
+  kable_classic(lightable_options = 'striped')
+
+
+plot(betadisp)
+```
+
+
+<br>
+
+___
+
+<br>
+
+# Distance Decay
+
+### Multiple Regression on Matrices
+
+```{r}
+readRDS("../output/MRM_table.RDS") %>% 
+  kable(caption = "SI Table 5. Call: MRM(asv_dist ~ haversine_dist,nperm=1000)") %>% 
+  kable_classic(lightable_options = 'striped')
+```
+
+
+### Mantel Test
+
+```{r}
+readRDS("../output/mantel_table.RDS") %>% 
+  kable(caption = "SI Table 6. Mantel Test statistics.") %>% 
+  kable_classic(lightable_options = 'striped')
+
+```
+
+<br>
+
+___
+
+<br>
+
+# Differential Abdundance
+
+
+```{r}
+bbd <- readRDS("../output/bbdml_significant_mod_tables.RDS")
+
+bbd %>% 
+  mutate(across(where(is.numeric),function(x){round(x,4)})) %>% 
+  kable(caption = "SI Table 7. BBDML model estimates from all significant genera (from corncob).") %>% 
+  kable_classic(lightable_options = 'striped')
+
+
+```
+
+
+<br>
+<br>
+<br>

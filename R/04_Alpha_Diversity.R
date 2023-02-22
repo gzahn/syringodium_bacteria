@@ -67,7 +67,7 @@ broom::tidy(mod_observed) %>%
 mod_shannon <- glm(data=alpha,
                     formula = Shannon ~ east_west * island)
 broom::tidy(mod_shannon) %>% 
-  filter(p.value<0.05)
+  saveRDS("./output/shannon_div_df.RDS")
 
 sink("./output/alpha_mod_shannon_summary.txt")
 summary(mod_shannon)

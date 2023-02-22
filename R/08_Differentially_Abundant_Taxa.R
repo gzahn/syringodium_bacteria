@@ -62,17 +62,34 @@ da_analysis_eastwest <- differentialTest(formula = ~ east_west, #abundance
 plot(da_analysis_eastwest) +
   theme(legend.position = 'none')
 
+# pull model info out for reporting
+mods <- da_analysis_eastwest$significant_models
+
+capture_mods <- function(x){
+ y <- x$coefficients %>% 
+        as.data.frame() %>%
+        janitor::clean_names()
+ names(y) <- c("estimate","std_error","t_value","p_value")
+ y <- y %>% 
+   mutate(p_value = p_value %>% round(6))
+ y <- y %>% 
+   filter(row.names(y) %>% grepl(pattern="east_west"))
+ return(y)
+}
+bbdml_mods <- map(mods,capture_mods)
+
 # find the significant taxa
 da_analysis_eastwest$significant_taxa
 sig_taxa <- da_analysis_eastwest$significant_taxa %>% otu_to_taxonomy(data=ps_genus)
 
-# # find abundance model coeficients
-# x <- 
-# da_analysis_eastwest$significant_models %>% 
-#   map(coef) %>% 
-#   map_dbl(2)
-# 
-# 
+names(bbdml_mods) <- sig_taxa
+joined_mods <- bbdml_mods %>% 
+  purrr::reduce(full_join)
+joined_mods$taxon <- names(bbdml_mods)
+joined_mods <- joined_mods %>% 
+  select(taxon,estimate,std_error,t_value,p_value)
+joined_mods %>%
+  saveRDS("./output/bbdml_significant_mod_tables.RDS")
 
 # run bbdml() on all significant taxa
 bbdml_obj <- multi_bbdml(da_analysis_eastwest,

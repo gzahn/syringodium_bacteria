@@ -47,7 +47,10 @@ haversine_dist <- geodist(meta %>% select(lon,lat),measure = "geodesic") %>% as.
 # Multiple regression on matrices
 mrm <- MRM(asv_dist ~ gps_dist, nperm = 1000)
 mrm_haversine <- MRM(asv_dist ~ haversine_dist,nperm=1000)
-
+mrm_haversine %>% as.data.frame() %>% 
+  mutate(coef.asv_dist = coef.asv_dist %>% round(3),
+         r.squared = r.squared %>% round(3)) %>% 
+  saveRDS("./output/MRM_table.RDS")
 # plot
 data.frame(haversine = haversine_dist %>% as.matrix() %>% c(),
            asv = asv_dist %>% as.matrix() %>% c()) %>% 
@@ -58,8 +61,16 @@ data.frame(haversine = haversine_dist %>% as.matrix() %>% c(),
 ggsave("./output/figs/comm_dist_vs_spatial_dist.png",dpi=300,height=4,width = 4)
 
 # MANTEL ####
-mant <- mantel(asv_dist,haversine_dist)
-mant
+mant <- vegan::mantel(asv_dist,haversine_dist)
+call <- mant$call %>% as.character()
+
+data.frame(
+  call=paste0(call[1],"(xdis = ",call[2],", ydis = ",call[3],")"),
+  test.stat=mant$statistic,
+  P.value=mant$signif,
+  N.perm=mant$permutations
+  ) %>% 
+  saveRDS("./output/mantel_table.RDS")
 
 # Mantel correlogram
 correlog <- mantel.correlog(D.eco = asv_dist,

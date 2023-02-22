@@ -1,16 +1,29 @@
-# Beta-Diversity
+# -----------------------------------------------------------------------------#
+# Syringodium isoetifolium beta diversity
+# Exploring alpha diersity metrics
+# Author: Geoffrey Zahn
+# Software versions:  R v 4.2.2
+#                     tidyverse v 1.3.2
+#                     vegan v 2.6.4
+#                     phyloseq v 1.42.0
+#                     broom v 1.0.3
+# -----------------------------------------------------------------------------#
 
 # SETUP ####
-# load packages
+
+# packages
 library(tidyverse); packageVersion("tidyverse")
 library(vegan); packageVersion("vegan")
 library(phyloseq); packageVersion("phyloseq")
-library(patchwork)
-library(geodist)
+library(patchwork); packageVersion("patchwork")
+library(geodist): packageVersion("geodist")
 
-# load phyloseq object
+# data
 ps <- readRDS("./output/clean_phyloseq_object.RDS")
 
+# ORDINATIONS ####
+
+# Bray-Curtis NMDS
 NMDS <- 
 ps %>% 
   transform_sample_counts(function(x){x/sum(x)}) %>% 
@@ -18,6 +31,7 @@ ps %>%
            distance = "bray")
 plot_ordination(ps,NMDS,color="location") +
   stat_ellipse()
+
 bray_plot <- plot_ordination(ps,NMDS,color="east_west") +
   stat_ellipse() +
   labs(title="Bray")
@@ -26,10 +40,6 @@ plot_ordination(ps,NMDS,color="lat")
 plot_ordination(ps,NMDS,color="lon")
 
 
-# Bray dissimilarity
-vegan::adonis2(ps %>% 
-                 transform_sample_counts(function(x){x/sum(x)}) %>% 
-                 otu_table() ~ ps@sam_data$east_west)
 
 # Unifrac distance
 # calculate weighted unifrac distance
@@ -51,6 +61,7 @@ unifrac_plot <- plot_ordination(ps,UFORD,color = "east_west") +
 
 bray_plot + unifrac_plot
 
+# PERMANOVA ####
 
 # send permanova results to text tables
 sink("./output/permanova_tables.txt")
@@ -61,6 +72,10 @@ vegan::adonis2(ps %>%
 print("Unifrac distance")
 adonis2(UF ~ ps@sam_data$east_west + ps@sam_data$location)
 sink(NULL)
+
+
+
+# EXTRA STUFF? ####
 
 lat <- ps@sam_data$lat
 lon <- ps@sam_data$lon

@@ -1,10 +1,13 @@
-##### Alpha Diversity #####
-
-# Dependencies:
-# tidyverse v 1.3.2
-# vegan v 2.6.4
-# phyloseq v 1.42.0
-# broom v 1.0.3
+# -----------------------------------------------------------------------------#
+# Syringodium isoetifolium alpha diversity
+# Exploring alpha diersity metrics
+# Author: Geoffrey Zahn
+# Software versions:  R v 4.2.2
+#                     tidyverse v 1.3.2
+#                     vegan v 2.6.4
+#                     phyloseq v 1.42.0
+#                     broom v 1.0.3
+# -----------------------------------------------------------------------------#
 
 # SETUP ####
 
@@ -18,14 +21,14 @@ library(broom); packageVersion("broom")
 source("./R/helper_functions.R")
 source("./R/theme.R")
 
-#options
+# options
 options(scipen=999)
 
 # data
 ps <- readRDS("./output/clean_phyloseq_object.RDS")
 
 
-# Alpha diversity measures ####
+# ALPHA-DIV ESTIMATES ####
 alpha <- estimate_richness(ps) %>% 
   select(Observed,Shannon, Simpson)
 plot_richness(ps,

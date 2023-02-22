@@ -1,8 +1,22 @@
-library(tidyverse)
-library(ecodist)
-library(phyloseq)
-library(vegan)
-library(geodist)
+# -----------------------------------------------------------------------------#
+# Syringodium isoetifolium distance decay
+# Exploring distance decay of similarity (Mantel + MRM)
+# Author: Geoffrey Zahn
+# Software versions:  R v 4.2.2
+#                     tidyverse v 1.3.2
+#                     vegan v 2.6.4
+#                     ecodist v 
+#                     geodist v 
+# -----------------------------------------------------------------------------#
+
+
+# Distance decay
+
+library(tidyverse); packageVersion("tidyverse")
+library(vegan); packageVersion("vegan")
+library(phyloseq); packageVersion("phyloseq")
+library(ecodist); packageVersion("ecodist")
+library(geodist); packageVersion("geodist")
 
 # load data
 ps <- readRDS("./output/clean_phyloseq_object.RDS") %>% 
@@ -29,14 +43,11 @@ class(meta)
 asv_dist <- vegdist(otu,method = "bray")
 
 # lat-lon distance matrix
+# nominal "distance" 
 gps_dist <- vegdist(meta %>% select(lat,lon),
                     method = "euclidean")
-# geodist (meters)
-data.frame(lat = c(40.37463398553633,40.374667371814795),
-           lon = c(-111.80117779863096,-111.80082938952233)) %>%
-  geodist(measure = "geodesic") %>% 
-  as.data.frame()
 
+# same thing, but in meters
 haversine_dist <- geodist(meta %>% select(lon,lat),measure = "geodesic") %>% as.dist()
 
 # Multiple regression on matrices

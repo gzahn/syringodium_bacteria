@@ -8,6 +8,7 @@ readRenviron("~/.Renviron")
 
 source("./R/helper_functions.R")
 source("./R/theme.R")
+source("./R/googlemap_styling.R")
 
 ps <- readRDS("./output/clean_phyloseq_object.RDS")
 
@@ -17,7 +18,7 @@ mapstyle = 'feature:all|element:labels|visibility:off&style=feature:water|elemen
 
 # network analysis
 net <- make_network(ps %>% 
-                      transform_sample_counts(function(x){x/sum(x)}),
+                    transform_sample_counts(function(x){x/sum(x)}),
                     keep.isolates = TRUE,max.dist = .5,distance = "bray")
 
 plot_network(g = net,
@@ -38,7 +39,7 @@ ps@sam_data$merge_var <- paste(ps@sam_data$east_west,
                                ps@sam_data$location,
                                sep="_")
 ps_island <- ps %>% 
-  merge_samples(merge_var)
+  merge_samples("merge_var")
 #repair metadata
 ps_island@sam_data$east_west <- 
 sample_names(ps_island) %>% 
@@ -53,7 +54,7 @@ sample_names(ps_island) <- ps_island@sam_data$location
 
 net <- make_network(ps %>% 
                       transform_sample_counts(function(x){x/sum(x)}),
-                    keep.isolates = TRUE,max.dist = .5,distance = "bray")
+                    keep.isolates = TRUE,max.dist = .3,distance = "bray")
 
 
 # overlay on map
@@ -85,22 +86,19 @@ ggraph::ggraph(lay) +
 
 
 
-area <- get_googlemap(center = c(lon = ps@sam_data$lon %>% mean, 
-                                 lat = ps@sam_data$lat %>% mean),
-                      zoom = 5, scale = 2,
-                      maptype='roadmap',
-                      style = mapstyle)
+mapstyle <- rjson::fromJSON(file = "./R/mapstyle2.json") %>% # from JSON file exported from snazzymaps.com
+  googlemap_json_to_string(.)
 
-area2 <- 
-get_map(location = c(lon = ps@sam_data$lon %>% mean, 
+area <- 
+  ggmap::get_googlemap(center = c(lon = ps@sam_data$lon %>% mean, 
                      lat = ps@sam_data$lat %>% mean),
         zoom = 5,
         scale = 2,
-        source = "stamen",
-        maptype="terrain-background",style=mapstyle)
+        style=mapstyle)
 
 lay_plot$weight <- lay_plot$relative_weight / nrow(lay_plot)
-ggmap(area2) +
+ggmap::ggmap(area) +
+  geom_segment(aes(x=114.8,y=-11,xend=122,yend=6),linetype=2,linewidth=.25,color="red") +
   ggraph::geom_edge_link(data = lay_plot,
                          aes(alpha=weight),
                          show.legend=FALSE) +
@@ -116,4 +114,4 @@ ggmap(area2) +
   theme(legend.position = "bottom",
         axis.title = element_text(face="bold",size=12))
 
-ggsave("./output/figs/mapped_network_plot_50maxdist.png",dpi=300,height = 6,width = 8)  
+ggsave("./output/figs/mapped_network_plot_30maxdist.png",dpi=300,height = 6,width = 8)  

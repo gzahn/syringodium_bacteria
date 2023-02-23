@@ -141,7 +141,8 @@ corncob_taxa <- sig_taxa %>%
 
 # subset bbdml tests to just those found by multipatt as well
 new_bbdml_obj <- new_bbdml_obj[which(names(new_bbdml_obj) %in% indicspecies_taxa)]
-
+new_bbdml_obj %>% names() %>% 
+  saveRDS("./output/final_significant_taxa.RDS")
 
 # plot all significant taxa with mu > 1.5 and found by multipatt
 plot_multi_bbdml(new_bbdml_obj,

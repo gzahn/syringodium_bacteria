@@ -1,0 +1,45 @@
+
+Call:
+glm(formula = Observed ~ east_west * island, data = alpha)
+
+Deviance Residuals: 
+     Min        1Q    Median        3Q       Max  
+-182.187   -55.203    -6.938    45.359   200.813  
+
+Coefficients: (12 not defined because of singularities)
+                                Estimate Std. Error t value             Pr(>|t|)    
+(Intercept)                       176.56      19.14   9.227 < 0.0000000000000002 ***
+east_westWest                      25.19      27.06   0.931             0.353247    
+islandBali                        -37.25      27.06  -1.376             0.170394    
+islandBanggai                     -30.88      27.06  -1.141             0.255437    
+islandBangka                       13.69      27.06   0.506             0.613635    
+islandBelitung                     29.62      27.06   1.095             0.275116    
+islandDerawan                     -29.88      27.06  -1.104             0.271099    
+islandHalmahera                     2.50      27.06   0.092             0.926500    
+islandKarimunjawa                  78.81      27.06   2.912             0.004043 ** 
+islandKomodo                       20.12      27.06   0.744             0.458059    
+islandPari                            NA         NA      NA                   NA    
+islandTual                        -16.81      27.06  -0.621             0.535223    
+islandWakatobi                    100.62      27.06   3.718             0.000268 ***
+east_westWest:islandBali              NA         NA      NA                   NA    
+east_westWest:islandBanggai           NA         NA      NA                   NA    
+east_westWest:islandBangka            NA         NA      NA                   NA    
+east_westWest:islandBelitung          NA         NA      NA                   NA    
+east_westWest:islandDerawan           NA         NA      NA                   NA    
+east_westWest:islandHalmahera         NA         NA      NA                   NA    
+east_westWest:islandKarimunjawa       NA         NA      NA                   NA    
+east_westWest:islandKomodo            NA         NA      NA                   NA    
+east_westWest:islandPari              NA         NA      NA                   NA    
+east_westWest:islandTual              NA         NA      NA                   NA    
+east_westWest:islandWakatobi          NA         NA      NA                   NA    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+(Dispersion parameter for gaussian family taken to be 5859.037)
+
+    Null deviance: 1392219  on 191  degrees of freedom
+Residual deviance: 1054627  on 180  degrees of freedom
+AIC: 2224.2
+
+Number of Fisher Scoring iterations: 2
+

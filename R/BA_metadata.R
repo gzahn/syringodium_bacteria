@@ -1,10 +1,16 @@
-library(tidyverse)
-library(readxl)
-library(rvest)
-library(curl)
+###########################################################
+## Arctic Oscillation and Pacific West metadata addition ##
+##Software versions:                                     ##
+##                     tidyverse v 1.3.2                 ##
+##                     curl v 5.0.0                      ##
+###########################################################
+
+# load necessary packages 
+library(tidyverse); packageVersion("tidyverse")
+library(curl); packageVersion("curl")
 
 # read in the data 
-dat<-read_xlsx("./data/syringodium_dates.xlsx")
+dat<-read_csv("./data/syringodium_dates.csv")
 
 fdate<-dat %>% drop_na(Collection_Date)
 
@@ -19,7 +25,6 @@ AOurl<-"https://www.cpc.ncep.noaa.gov/products/analysis_monitoring/ocean/index/h
 
 # how to get the URL into text 
 ao_raw<-curl(AOurl)
-
 
 AO_lines<-readLines(ao_raw)
 

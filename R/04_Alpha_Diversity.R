@@ -108,3 +108,4 @@ ps_island %>%
   transform_sample_counts(function(x){x/sum(x)}) %>% 
   plot_heatmap(taxa.label = "Phylum",sample.label = "location") + 
   facet_wrap(~east_west,scales = "free_x")
+ggsave("./output/figs/phylum_heatmap_east-west.png",dpi=300,width = 6, height = 6)

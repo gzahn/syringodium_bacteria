@@ -25,6 +25,8 @@ source("./R/helper_functions.R")
 source("./R/theme.R")
 source("./R/googlemap_styling.R")
 
+set.seed(666)
+
 # Load google maps API key from .Renviron and set map style
 ggmap::register_google(key = Sys.getenv("export APIKEY")) # Key kept private
 mapstyle <- rjson::fromJSON(file = "./R/mapstyle2.json") %>% # from JSON file exported from snazzymaps.com
@@ -33,12 +35,12 @@ mapstyle <- rjson::fromJSON(file = "./R/mapstyle2.json") %>% # from JSON file ex
 
 # DATA ####
 ps <- readRDS("./output/clean_phyloseq_object.RDS")
-
+maxdist <- readRDS("./output/minimum_comm_dist_network.RDS")
 
 # MAKE NETWORK ####
 net <- make_network(ps %>% 
                     transform_sample_counts(function(x){x/sum(x)}),
-                    keep.isolates = TRUE,max.dist = .5,distance = "bray")
+                    keep.isolates = TRUE,max.dist = maxdist,distance = "bray")
 
 # PLOT NETWORK ####
 plot_network(g = net,
@@ -50,9 +52,9 @@ plot_network(g = net,
 plot_net(ps %>% 
            transform_sample_counts(function(x){x/sum(x)}),
          color = "east_west",
-         maxdist = .7,
+         maxdist = maxdist,
          point_alpha = .5)
-
+ggsave("./output/figs/simple_network_plot.png",dpi=300,height = 4,width = 4)
 
 # merge by island before making network
 ps@sam_data$merge_var <- paste(ps@sam_data$east_west,
@@ -74,7 +76,7 @@ sample_names(ps_island) <- ps_island@sam_data$location
 
 net <- make_network(ps %>% 
                       transform_sample_counts(function(x){x/sum(x)}),
-                    keep.isolates = TRUE,max.dist = .3,distance = "bray")
+                    keep.isolates = TRUE,max.dist = 1-maxdist,distance = "bray")
 
 
 # overlay on map
@@ -91,7 +93,6 @@ lay <- ggraph::create_layout(net,
 # add weights and variables
 lay$weight <- igraph::degree(net)
 lay$east_west <- ps@sam_data$east_west
-lay %>% head
 ge <- ggraph::get_edges()
 lay_plot <- ge(lay)
 
@@ -126,8 +127,12 @@ ggmap::ggmap(area) +
                      breaks=c("West","East")) +
   labs(color="Side of\nWallace's Line",
        x="Longitude",
-       y="Latitude") +
+       y="Latitude",
+       caption = paste0("Max dist. of ",
+                        round(1- maxdist,2),
+                        " based on GAM intercept from MRM")) +
   theme(legend.position = "bottom",
         axis.title = element_text(face="bold",size=12))
 
-ggsave("./output/figs/mapped_network_plot_30maxdist.png",dpi=300,height = 6,width = 8)  
+ggsave("./output/figs/mapped_network_plot_30maxdist.png",
+       dpi=300,height = 6,width = 8)  

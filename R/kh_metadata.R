@@ -17,8 +17,8 @@ library(stringr); packageVersion("stringr") # 1.4.1
 
 # download csv files###
 # collection dates by Wainwright (you need to make sure the location is right)
-coll_dates <- read.csv("./metadata/syringodium_dates.csv")
-metadata <- readRDS("./metadata/metadata_for_taxonomy.RDS")
+coll_dates <- read.csv("./data/syringodium_dates.csv")
+metadata <- readRDS("./data/metadata_for_taxonomy.RDS")
 
 ##----------------
 ##COMMAND LINE: WGET URL
@@ -329,4 +329,4 @@ colnames(md_test)[2] = "mean_month_slvl"
 
 # write csv
 md_test %>% 
-  write_csv("./metadata/kh_metadata.csv")
+  write_csv("./data/kh_metadata.csv")

@@ -10,6 +10,10 @@
 #                     vegan v 2.6.4
 #                     patchwork v 1.1.2
 #                     indicspecies v 1.7.12
+#                     microbiome v 1.20.0
+#                     ranger v 0.14.1                    
+#                     ALEPlot v 1.1
+#                     vip v 0.3.2
 # -----------------------------------------------------------------------------#
 
 # SETUP ####
@@ -22,6 +26,10 @@ library(corncob); packageVersion("corncob")
 library(vegan); packageVersion("vegan")
 library(patchwork); packageVersion("patchwork")
 library(indicspecies); packageVersion("indicspecies")
+library(microbiome); packageVersion("microbiome")
+library(ranger); packageVersion("ranger")
+library(ALEPlot); packageVersion("ALEPlot")
+library(vip); packageVersion("vip")
 
 
 # Helper functions
@@ -48,7 +56,7 @@ ASV_taxa <- otu_to_taxonomy(ASV_names,ps,level = c("Phylum","Class","Order","Fam
 genus_names <- otu_table(ps_genus) %>% colnames()
 genus_taxa <- otu_to_taxonomy(genus_names,ps_genus,level = c("Phylum","Class","Order","Family","Genus"))
 
-# DIFFABUND TESTS ####
+# CORNCOB DIFFABUND ####
 
 # use raw count data for corncob
 da_analysis_eastwest <- differentialTest(formula = ~ east_west, #abundance
@@ -132,6 +140,48 @@ x <- row.names(indval$A)
 indicspecies_taxa <- x[which(indval$sign$p.value < 0.05)] %>% 
                       str_split("_") %>% 
                       map_chr(5)
+# RANDOM FOREST ####
+# use relative abundance transformations for Ranger
+ps_genus <- ps_genus %>% 
+  transform_sample_counts(function(x){x/sum(x)})
+
+# get data ready for RF modeling
+meta <- microbiome::meta(ps_genus) %>% 
+  select(east_west) %>% 
+  mutate(east = case_when(east_west == "East" ~ TRUE, # east is logical response
+                          east_west == "West" ~ FALSE)) %>% 
+  select(east)
+asv <- otu_table(ps_genus) %>% 
+  as("matrix") %>% 
+  as.data.frame()
+df <- 
+  meta %>% 
+  bind_cols(asv)
+# train RF model on full data set
+ranger_model <- ranger::ranger(east~., 
+                               data = df, 
+                               classification = TRUE, 
+                               probability = TRUE,
+                               importance = 'permutation')
+# find top important taxa
+top <- vip::vip(ranger_model,num_features=20) # find most important factors for success (survival)
+top +
+  theme(axis.text.y = element_blank())
+vip_taxa <- corncob::otu_to_taxonomy(top$data$Variable,data = ps_genus) %>% unname()
+vip_taxa
+
+pred <- predict(ranger_model,df) # how does it do predicting itself (no cross-validation)
+preds <- pred$predictions %>% 
+  as.data.frame() %>% 
+  bind_cols(df$east)
+names(preds) <- c("prob_T","prob_F","east")
+
+preds %>% 
+  ggplot(aes(x=prob_T,fill=east)) +
+  geom_density()
+vip_taxa %>% 
+  saveRDS("./output/ranger_vip_taxa.RDS")
+
 
 # COMMON DIFFABUND TAXA ####
 # find taxa that were detected by all methods
@@ -141,8 +191,17 @@ corncob_taxa <- sig_taxa %>%
 
 # subset bbdml tests to just those found by multipatt as well
 new_bbdml_obj <- new_bbdml_obj[which(names(new_bbdml_obj) %in% indicspecies_taxa)]
+
+# also subset bbdml tests to those found by Ranger as well
+vip_taxa <- vip_taxa %>% 
+  str_split("_") %>% 
+  map_chr(6)
+new_bbdml_obj <- new_bbdml_obj[which(names(new_bbdml_obj) %in% vip_taxa)]
+
 new_bbdml_obj %>% names() %>% 
   saveRDS("./output/final_significant_taxa.RDS")
+new_bbdml_obj %>% 
+  saveRDS("./output/final_significant_bbdml_list.RDS")
 
 # plot all significant taxa with mu > 1.5 and found by multipatt
 plot_multi_bbdml(new_bbdml_obj,
@@ -169,69 +228,49 @@ for(i in plots){
 plots <- ls(pattern = "^bbdml_plot_")
 
 p1 <- bbdml_plot_1 +
+  labs(color="East or West of\nWallace's Line") +
   theme(legend.position = 'none',
         axis.title.y = element_blank())
 p2 <- bbdml_plot_2 +
+  labs(color="East or West of\nWallace's Line") +
   theme(axis.title.y = element_blank(),
         legend.position = 'none')
 p3 <- bbdml_plot_3 +
+  labs(color="East or West of\nWallace's Line") +
   theme(axis.title.y = element_blank(),
-        legend.position = 'none') +
-  labs(color="East or West of\nWallace's Line")
+        legend.position = 'none')
 p4 <- bbdml_plot_4 +
+  labs(color="East or West of\nWallace's Line") +
   theme(axis.title.y = element_blank(),
         legend.position = 'none')
 p5 <- bbdml_plot_5 +
+  labs(y="Relative\nabundance",
+       color="East or West of\nWallace's Line") +
+  theme(legend.position = 'none')
+p6 <- bbdml_plot_6 +
+  labs(color="East or West of\nWallace's Line") +
+  theme(axis.title.y = element_blank(),
+        legend.position = 'none') 
+p7 <- bbdml_plot_7 +
+  labs(color="East or West of\nWallace's Line") +
   theme(axis.title.y = element_blank(),
         legend.position = 'none')
-p6 <- bbdml_plot_6 +
-  theme(legend.position = 'none',
-        axis.title.y = element_blank()) +
-  labs(color="East or West of\nWallace's Line")
-p7 <- bbdml_plot_7 +
-  theme(legend.position = 'none') +
-  labs(y="Relative\nabundance")
 p8 <- bbdml_plot_8 +
+  labs(color="East or West of\nWallace's Line") +
   theme(axis.title.y = element_blank(),
         legend.position = 'none')
 p9 <- bbdml_plot_9 +
+  labs(color="East or West of\nWallace's Line") +
   theme(legend.position = 'none',
-        axis.title.y = element_blank()) +
-  labs(color="East or West of\nWallace's Line")
+        axis.title.y = element_blank())
 p10 <- bbdml_plot_10 +
-  theme(axis.title.y = element_blank(),
-        legend.position = 'none')
-p11 <- bbdml_plot_11 +
-  theme(axis.title.y = element_blank(),
-        legend.position = 'none')
-p12 <- bbdml_plot_12 +
-  theme(legend.position = 'none',
-        axis.title.y = element_blank()) +
-  labs(color="East or West of\nWallace's Line")
-p13 <- bbdml_plot_13 +
-  theme(axis.title.y = element_blank(),
-        legend.position = 'none')
-p14 <- bbdml_plot_14 +
-  theme(axis.title.y = element_blank(),
-        legend.position = 'none')
-p15 <- bbdml_plot_15 +
-  theme(legend.position = 'none',
-        axis.title.y = element_blank()) +
-  labs(color="East or West of\nWallace's Line") 
-p16 <- bbdml_plot_16 +
-  theme(axis.title.y = element_blank(),
-        legend.position = 'none') 
-p17 <- bbdml_plot_17 +
-  theme(legend.position = 'bottom',
-        axis.title.y = element_blank()) +
-  labs(color="East or West of\nWallace's Line")
-p18 <- bbdml_plot_18 +
-  theme(legend.position = 'none',
-        axis.title.y = element_blank()) +
-  labs(color="East or West of\nWallace's Line")
+  labs(color="East or West of\nWallace's Line") +
+  theme(axis.title.y = element_blank())
 
 
 
 
-(p1 + p2 + p3) / (p4 + p5 + p6) / (p7 + p8 + p9) / (p10 + p11 + p12) / (p13 + p14 + p15) / (p16 + p17 + p18)
-ggsave("./output/figs/differential_abundance_sig_taxa.png", height = 8, width = 14,dpi=300)
+(p1 + p2) / (p3 + p4) / (p5 + p6) / (p7 + p8) / (p9 + p10) +
+  plot_layout(guides = "collect") & 
+  theme(legend.position = 'bottom')
+ggsave("./output/figs/differential_abundance_sig_taxa.png", height = 8, width = 10,dpi=300)

@@ -18,6 +18,9 @@ library(phyloseq); packageVersion("phyloseq")
 library(ecodist); packageVersion("ecodist")
 library(geodist); packageVersion("geodist")
 
+set.seed(666)
+
+
 # DATA ####
 ps <- readRDS("./output/clean_phyloseq_object.RDS") %>% 
   transform_sample_counts(function(x){x/sum(x)})
@@ -60,6 +63,49 @@ data.frame(haversine = haversine_dist %>% as.matrix() %>% c(),
   labs(y="Community distance",x="Haversine distance (m)")
 ggsave("./output/figs/comm_dist_vs_spatial_dist.png",dpi=300,height=4,width = 4)
 
+# UNIFRAC DISTANCE
+# GeoSphere sample distance vs UniFrac distance
+lat <- ps@sam_data$lat
+lon <- ps@sam_data$lon
+
+# calculate positional distance between samples (relative, euclidean)
+gps_dist <- 
+  data.frame(lat,lon,row.names = sample_names(ps)) %>% 
+  dist()
+
+heatmap(as.matrix(gps_dist))
+
+dist_m <- 
+  geosphere::distm(data.frame(lon,lat)) %>% 
+  as.dist()
+UF <- UniFrac(ps %>% 
+                transform_sample_counts(function(x){x/sum(x)}),
+              weighted=TRUE)
+
+data.frame(unifrac=c(UF),
+           gps=c(dist_m)) %>% 
+  ggplot(aes(x=dist_m,y=UF)) +
+  geom_point(alpha=.05) +
+  geom_smooth() +
+  labs(x="Spatial distance (m)",
+       y="Community distance (UniFrac)")
+
+ggsave("./output/figs/comm_dist_vs_spatial_dist_unifrac.png",
+       dpi=300,height = 6,width = 6)
+# use GAM from MRM to set minimum community connectivity for network analysis
+minimum_comm_dist_network <-   
+  abs(
+    data.frame(unifrac=c(UF),
+               gps=c(dist_m)) %>%
+      gam::gam(data = .,
+               formula = unifrac ~ gps) %>% 
+      coef() %>% 
+      pluck("(Intercept)") - 1  
+  )
+saveRDS(minimum_comm_dist_network,
+        "./output/minimum_comm_dist_network.RDS")
+
+
 # MANTEL ####
 mant <- vegan::mantel(asv_dist,haversine_dist)
 call <- mant$call %>% as.character()
@@ -76,5 +122,4 @@ data.frame(
 correlog <- mantel.correlog(D.eco = asv_dist,
                 D.geo = haversine_dist)
 plot(correlog)
-
 

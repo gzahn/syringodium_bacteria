@@ -112,48 +112,75 @@ x <- sample_data(pop_group_metadata) # convert to sample_data object
 sample_names(x) <- x$sample # make sample names match
 ps@sam_data <- x # add to ps
 
+## Precipitation data (Josh Leon) ####
+#source("./R/Leon_metadata.R")
+# add to ps object sample_data
+
+
+## Sea level - mean monthly (Kate Hickman) ####
+source("./R/kh_metadata.R")
+sea_level <- read_csv("./data/kh_metadata.csv")
+# add to ps object sample_data
+new_metadata <- sea_level %>% 
+  dplyr::rename(sample = sample_id) %>% 
+  full_join(microbiome::meta(ps)) %>% 
+  sample_data()
+sample_names(new_metadata) <- new_metadata$sample
+ps <- phyloseq(otu_table(ps@otu_table),
+         tax_table(ps@tax_table),
+         phy_tree(ps@phy_tree),
+         new_metadata)
+
+
+
 # Save RDS object for cleaned up Phyloseq object
 saveRDS(ps, file = "./output/clean_phyloseq_object.RDS")
 
 
 
+
+
+
+#######################################################################
+
+# 
 # MESSING ABOUT ####
-
-# does pop_group predict microbiome?
-asv <- 
-ps %>% 
-  transform_sample_counts(function(x){x/sum(x)}) %>% 
-  otu_table()
-vegan::adonis2(asv ~ ps@sam_data$east_west + ps@sam_data$location + ps@sam_data$pop_group)
-
-# how does population structure look on a map?
-ggmap::register_google(key = Sys.getenv("export APIKEY")) # Key kept private
-# custom map style from JSON file
-mapstyle <- rjson::fromJSON(file = "./R/mapstyle2.json") %>% # from JSON file exported from snazzymaps.com
-  googlemap_json_to_string(.)
-
-area2 <- 
-  ggmap::get_googlemap(center = c(lon = ps@sam_data$lon %>% mean, 
-                       lat = ps@sam_data$lat %>% mean),
-          zoom = 5,
-          scale = 2,
-          style=mapstyle)
-ggmap::ggmap(area2) 
-
-
-meta <- microbiome::meta(ps)
-
-
-ggmap::ggmap(area2) +
-  geom_jitter(data=meta,
-              aes(x=lon,y=lat,color=pop_group),
-              width = .5,
-              height = .5,
-              size=2) +
-  scale_color_viridis_d() +
-  geom_segment(aes(x=114.8,y=-11,xend=122,yend=6),linetype=2,linewidth=.25) +
-  labs(color="Host\npopulation group",
-       caption = paste0("Population groupings based on ",
-                        gt %>% select(-name) %>% ncol(),
-                        " microsatellite markers."))
-ggsave("./output/figs/host_population_structure_map.png",dpi=300,height = 6, width = 6)
+# 
+# # does pop_group predict microbiome?
+# asv <- 
+# ps %>% 
+#   transform_sample_counts(function(x){x/sum(x)}) %>% 
+#   otu_table()
+# vegan::adonis2(asv ~ ps@sam_data$east_west + ps@sam_data$location + ps@sam_data$pop_group)
+# 
+# # how does population structure look on a map?
+# ggmap::register_google(key = Sys.getenv("export APIKEY")) # Key kept private
+# # custom map style from JSON file
+# mapstyle <- rjson::fromJSON(file = "./R/mapstyle2.json") %>% # from JSON file exported from snazzymaps.com
+#   googlemap_json_to_string(.)
+# 
+# area2 <- 
+#   ggmap::get_googlemap(center = c(lon = ps@sam_data$lon %>% mean, 
+#                        lat = ps@sam_data$lat %>% mean),
+#           zoom = 5,
+#           scale = 2,
+#           style=mapstyle)
+# ggmap::ggmap(area2) 
+# 
+# 
+# meta <- microbiome::meta(ps)
+# 
+# 
+# ggmap::ggmap(area2) +
+#   geom_jitter(data=meta,
+#               aes(x=lon,y=lat,color=pop_group),
+#               width = .5,
+#               height = .5,
+#               size=2) +
+#   scale_color_viridis_d() +
+#   geom_segment(aes(x=114.8,y=-11,xend=122,yend=6),linetype=2,linewidth=.25) +
+#   labs(color="Host\npopulation group",
+#        caption = paste0("Population groupings based on ",
+#                         gt %>% select(-name) %>% ncol(),
+#                         " microsatellite markers."))
+# ggsave("./output/figs/host_population_structure_map.png",dpi=300,height = 6, width = 6)

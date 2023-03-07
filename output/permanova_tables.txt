@@ -19,9 +19,9 @@ Number of permutations: 999
 
 adonis2(formula = UF ~ ps@sam_data$east_west + ps@sam_data$location)
                        Df SumOfSqs      R2      F Pr(>F)    
-ps@sam_data$east_west   1   1.3604 0.13001 51.945  0.001 ***
-ps@sam_data$location   10   4.3897 0.41949 16.761  0.001 ***
-Residual              180   4.7142 0.45050                  
-Total                 191  10.4643 1.00000                  
+ps@sam_data$east_west   1   2.2702 0.11058 42.065  0.001 ***
+ps@sam_data$location   10   8.5451 0.41623 15.833  0.001 ***
+Residual              180   9.7145 0.47319                  
+Total                 191  20.5297 1.00000                  
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1

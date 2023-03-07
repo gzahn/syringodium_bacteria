@@ -36,10 +36,7 @@ ps_genus@sam_data$location <- sample_names(ps_genus)
 # subset to just significant (corncob) taxa  
 ps_genus_sig <- 
   ps_genus %>% 
-  subset_taxa(paste(tax_table(ps_genus)[,1],tax_table(ps_genus)[,2],tax_table(ps_genus)[,3],
-                    tax_table(ps_genus)[,4],tax_table(ps_genus)[,5],tax_table(ps_genus)[,6],
-                    sep = "_") %in%
-                sig_mods$taxon)
+  subset_taxa(tax_table(ps_genus)[,6] %in% final_sig_taxa)
 # pull out metadata for convenience
 meta <- microbiome::meta(ps_genus_sig)
 
@@ -53,7 +50,7 @@ area <-
 
 
 # for-loop to plot all maps of each significant genus (saved as files)
-for(i in seq_along(sig_mods$taxon)){
+for(i in seq_along(final_sig_taxa)){
   
   g <- sig_mods$taxon[i] %>% str_split("_") %>% map_chr(6)
   abund <- ps_genus_sig@otu_table[,i] %>% as("numeric")
@@ -78,9 +75,9 @@ for(i in seq_along(sig_mods$taxon)){
 }
 
 # add relabund data to metadata df
-for(i in seq_along(sig_mods$taxon)){
+for(i in seq_along(final_sig_taxa)){
   
-  g <- sig_mods$taxon[i] %>% str_split("_") %>% map_chr(6)
+  g <- final_sig_taxa[i]
   abund <- ps_genus_sig@otu_table[,i] %>% as("numeric")
   meta[g] <- abund
   

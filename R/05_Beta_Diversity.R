@@ -70,11 +70,21 @@ bray_plot + unifrac_plot
 # PERMANOVA ####
 
 # specify model tables for Supplementary Info
+
+# Bray-Curtis permanova
 vegan::adonis2(ps %>% 
                  transform_sample_counts(function(x){x/sum(x)}) %>% 
-                 otu_table() ~ ps@sam_data$east_west + ps@sam_data$location) %>% broom::tidy() %>% 
+                 otu_table() ~ 
+                 ps@sam_data$east_west + 
+                 ps@sam_data$location) %>% 
+  broom::tidy() %>% 
   saveRDS("./output/bray_betadiv_df.RDS")
-adonis2(UF ~ ps@sam_data$east_west + ps@sam_data$location) %>% broom::tidy() %>% 
+
+# UniFrac permanova
+adonis2(UF ~ 
+          ps@sam_data$east_west + 
+          ps@sam_data$location) %>% 
+  broom::tidy() %>% 
   saveRDS("./output/unifrac_betadiv_df.RDS")
 
 # beta-dispersion
@@ -87,32 +97,20 @@ vegan::betadisper(UF,ps@sam_data$east_west,type = 'centroid') %>%
 
 
 
-# send permanova results to text tables
-sink("./output/permanova_tables.txt")
-print("Bray distance")
-vegan::adonis2(ps %>% 
-                 transform_sample_counts(function(x){x/sum(x)}) %>% 
-                 otu_table() ~ ps@sam_data$east_west)
-print("Unifrac distance")
-adonis2(UF ~ ps@sam_data$east_west + ps@sam_data$location)
-sink(NULL)
+# # send permanova results to text tables
+# sink("./output/permanova_tables.txt")
+# print("Bray distance")
+# vegan::adonis2(ps %>% 
+#                  transform_sample_counts(function(x){x/sum(x)}) %>% 
+#                  otu_table() ~ ps@sam_data$east_west)
+# print("Unifrac distance")
+# adonis2(UF ~ ps@sam_data$east_west + ps@sam_data$location)
+# sink(NULL)
 
 
 
 # EXTRA STUFF? ####
 
-lat <- ps@sam_data$lat
-lon <- ps@sam_data$lon
-sample_names(ps)
-
-# calculate positional distance between samples (relative, euclidean)
-gps_dist <- 
-data.frame(lat,lon,row.names = sample_names(ps)) %>% 
-  dist()
-
-heatmap(as.matrix(gps_dist))
-
-plot()
 
 # plot distance matrices
 data.frame(unifrac=c(UF),
@@ -133,25 +131,3 @@ data.frame(unifrac=c(UF),
       formula = unifrac ~ gps) %>% 
   coef()
 
-dist_m <- 
-geosphere::distm(data.frame(lon,lat)) %>% 
-  as.dist()
-
-data.frame(unifrac=c(UF),
-           gps=c(dist_m)) %>% 
-  ggplot(aes(x=dist_m,y=UF)) +
-  geom_point() +
-  geom_smooth(method="lm")
-  
-
-glm(data = .,
-      formula = unifrac ~ gps) %>% 
-  coef()
-
-
-bk <- 
-data.frame(lat,lon,location = sample_names(ps)) %>% 
-  filter(grepl("Bali|Komodo",location))
-
-geodist(bk %>% select(lon,lat)) %>% 
-  dist()

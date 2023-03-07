@@ -39,12 +39,15 @@ dates$Host <- NULL
 
 
 # Load precipitation data and clean ####
-precip_data <- read_csv("./data/precip_data.csv") %>% 
+precip_data <- read_csv("./data/Precip_raw.csv") %>% 
   rename(Collection_Date = DATE) %>% 
   select(c(NAME, LATITUDE, LONGITUDE, Collection_Date, PRCP))
 
 # Match the format of dates to the metadata dates
+# Create seperate columns for month and year
 precip_data$Collection_Date <- format(precip_data$Collection_Date, "%Y-%m")
+precip_data <- precip_data %>% 
+  separate(col = Collection_Date,into = c("Year", "Month"),sep = "-")
 
 # Change N/As to 0s for precipitation
 precip_data <- 
@@ -60,7 +63,7 @@ precip_data <-
 # Get the sum for precipitation for grouped by station and collection date
 final_precip_df <- 
   precip_data %>% 
-  group_by(NAME, Collection_Date) %>% 
+  group_by(NAME, Year, Month) %>% 
   summarize(Precipitation = sum(PRCP),
             LATITUDE = LATITUDE,
             LONGITUDE = LONGITUDE) %>%  unique()
@@ -107,14 +110,18 @@ sam_data_coord$NAME <- c("ALOR MALI KALABAHI, ID",
 # Merging the two dataseets ####
 final_precip_df <- 
   final_precip_df %>% 
-  select(NAME, Collection_Date, Precipitation)
+  select(NAME, Year, Month, Precipitation)
 
 merged_intermediate <- merge(final_precip_df, sam_data_coord)
 cleanedish_meta <- merge(merged_intermediate, dates)
+cleanedish_meta <- cleanedish_meta %>% 
+  separate(col = Collection_Date, into = c("Year2", "Month2"), "-")
 
 clean_meta <- 
   cleanedish_meta %>% 
-  filter(Lat == sam_data_lat)
+  filter(Lat == sam_data_lat,
+         Year == Year2,
+         Month == Month2)
 
 clean_meta <- 
   clean_meta %>% 
@@ -262,5 +269,5 @@ clean_meta <- clean_meta[!grepl("Natuna", clean_meta$sample),]
 clean_meta <- clean_meta[!grepl("Sanur", clean_meta$sample),]
 
 # If you want to save the clean dataset
-##write_csv(x = clean_meta, file = "./data/precip_metadata.csv")
+##write_csv(x = clean_meta, file = "./output/precip_metadata.csv")
 

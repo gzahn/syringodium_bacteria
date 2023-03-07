@@ -32,10 +32,14 @@ meta %>%
 
 
 # train RF model on full data set
-ranger_model <- ranger::ranger(east~., data = df, classification = TRUE, probability = TRUE,importance = 'permutation')
-
+ranger_model <- ranger::ranger(east~., 
+                               data = df, 
+                               classification = TRUE, 
+                               probability = TRUE,
+                               importance = 'permutation')
+?vip
 # find top important taxa
-top <- vip::vip(ranger_model) # find most important factors for success (survival)
+top <- vip::vip(ranger_model,num_features=20) # find most important factors for success (survival)
 top +
   theme(axis.text.y = element_blank())
 vip_taxa <- corncob::otu_to_taxonomy(top$data$Variable,data = ps_genus) %>% unname()

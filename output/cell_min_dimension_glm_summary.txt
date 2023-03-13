@@ -1,0 +1,24 @@
+
+Call:
+glm(formula = min_dimension ~ signifigant_taxa, data = morphology)
+
+Deviance Residuals: 
+     Min        1Q    Median        3Q       Max  
+-0.49953  -0.19953  -0.09953   0.15047   1.90047  
+
+Coefficients:
+                     Estimate Std. Error t value            Pr(>|t|)    
+(Intercept)           0.59953    0.01008   59.50 <0.0000000000000002 ***
+signifigant_taxaTRUE -0.08203    0.03663   -2.24              0.0254 *  
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+(Dispersion parameter for gaussian family taken to be 0.08679835)
+
+    Null deviance: 80.550  on 924  degrees of freedom
+Residual deviance: 80.115  on 923  degrees of freedom
+  (117 observations deleted due to missingness)
+AIC: 368.18
+
+Number of Fisher Scoring iterations: 2
+

@@ -1,0 +1,22 @@
+[1] "Genus significance and shape"
+             
+              FALSE TRUE
+  coccus         23    0
+  curved          1    0
+  filament        1    0
+  helical         1    0
+  other           9    0
+  oval            2    0
+  ovoid          28    0
+  pleomorphic     4    1
+  rod           793   68
+  spiral          5    1
+  vibrio          2    0
+[1] ""
+
+	Pearson's Chi-squared test
+
+data:  .
+X-squared = 7.5206, df = 10, p-value = 0.6755
+
+[1] "No apparent enrichment in cell shape morphology in significant taxa"

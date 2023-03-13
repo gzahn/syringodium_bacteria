@@ -28,6 +28,10 @@ set.seed(061223)
 # data
 ps <- readRDS("./output/clean_phyloseq_object.RDS")
 
+# theme
+theme_set(theme_minimal())
+source("./R/theme.R")
+
 # ORDINATIONS ####
 
 # Bray-Curtis NMDS
@@ -41,7 +45,8 @@ plot_ordination(ps,NMDS,color="location") +
 
 bray_plot <- plot_ordination(ps,NMDS,color="east_west") +
   stat_ellipse() +
-  labs(title="Bray")
+  labs(title="Bray",color="Side of\nWallace's Line") +
+  scale_color_manual(values = pal.discrete, breaks=c("West","East")) 
 
 plot_ordination(ps,NMDS,color="lat")
 plot_ordination(ps,NMDS,color="lon")
@@ -62,11 +67,14 @@ UFORD <- ordinate(ps %>%
 # plot the unifrac ordination
 unifrac_plot <- plot_ordination(ps,UFORD,color = "east_west") +
   stat_ellipse() +
-  labs(title = "Unifrac")
+  labs(title = "Unifrac",color="Side of\nWallace's Line") +
+  scale_color_manual(values = pal.discrete, breaks=c("West","East"))
 
 
-bray_plot + unifrac_plot
-
+bray_plot + unifrac_plot + 
+  plot_layout(guides = "collect") & 
+  theme(legend.position = 'bottom')
+ggsave("./output/figs/ordination_plots.png",dpi=300,height = 6, width = 10)
 # PERMANOVA ####
 
 # specify model tables for Supplementary Info

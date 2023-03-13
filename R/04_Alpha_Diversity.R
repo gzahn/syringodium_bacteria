@@ -27,20 +27,25 @@ options(scipen=999)
 # data
 ps <- readRDS("./output/clean_phyloseq_object.RDS")
 
-
+m <- microbiome::meta(ps)
+we <- m %>% 
+  arrange(lon) %>% 
+  pluck("location") %>% unique()
 # ALPHA-DIV ESTIMATES ####
 alpha <- estimate_richness(ps) %>% 
   select(Observed,Shannon, Simpson)
+# convert island to factor for plot ordering
+ps@sam_data$location <- factor(ps@sam_data$location,levels = we)
+
 plot_richness(ps,
               x="location",
               measures = c("Observed","Shannon"),
-              sortby = "Shannon",
               color="east_west") +
   labs(color="Side of\nWallace's Line",
        x="Island") +
   theme(legend.title = element_text(hjust=.5),
         legend.position = "bottom") +
-  scale_color_manual(values=pal.discrete)
+  scale_color_manual(values=pal.discrete,breaks = c("West","East"))
 ggsave("./output/figs/alpha_diversity_east_west_island.png",dpi=300,
        height = 4,width = 4)
 

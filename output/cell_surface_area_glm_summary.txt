@@ -4,21 +4,21 @@ glm(formula = est_surface_area ~ signifigant_taxa, data = morphology)
 
 Deviance Residuals: 
     Min       1Q   Median       3Q      Max  
--3.5923  -2.4633  -0.8851   0.5664  17.0833  
+  -34.1    -32.0    -29.7    -24.0  15673.7  
 
 Coefficients:
-                     Estimate Std. Error t value        Pr(>|t|)    
-(Intercept)            3.8436     0.4941   7.779 0.0000000000396 ***
-signifigant_taxaTRUE   0.2404     3.0054   0.080           0.936    
+                     Estimate Std. Error t value Pr(>|t|)  
+(Intercept)             34.22      17.78   1.925   0.0546 .
+signifigant_taxaTRUE   -20.06      64.80  -0.310   0.7569  
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
-(Dispersion parameter for gaussian family taken to be 17.57702)
+(Dispersion parameter for gaussian family taken to be 271773.8)
 
-    Null deviance: 1265.7  on 73  degrees of freedom
-Residual deviance: 1265.5  on 72  degrees of freedom
-  (968 observations deleted due to missingness)
-AIC: 426.1
+    Null deviance: 252232158  on 929  degrees of freedom
+Residual deviance: 252206101  on 928  degrees of freedom
+  (112 observations deleted due to missingness)
+AIC: 14280
 
 Number of Fisher Scoring iterations: 2
 

@@ -220,7 +220,7 @@ morphology <- morphology %>%
          est_vol = min_length * min_width,
          shape = shape %>% str_remove("-shaped"),
          est_surface_area = case_when(shape == "coccus" ~ 4*pi*((min_dimension/2)^2),
-                                  shape != "rod" ~ (2*pi*((min_length/2)^2))))
+                                  shape != "coccus" ~ (2*pi*((min_length/2)^2))))
 
 # distribution plots
 morphology %>% 
@@ -264,7 +264,11 @@ mod_surfacearea <-
   glm(data=morphology,
       formula = est_surface_area ~ signifigant_taxa)
 report::report(mod_surfacearea)
-
+mod_surfacearea %>% summary
 sink("./output/cell_surface_area_glm_summary.txt")
 summary(mod_surfacearea)
 sink(NULL)
+
+
+# export morphology database
+write_csv(morphology)

@@ -5,6 +5,7 @@
 # vegan v 2.5.7
 # phyloseq v 1.36.0
 # broom v 0.7.10
+# janitor v 2.1.0
 
 # SETUP ####
 
@@ -13,10 +14,9 @@ library(tidyverse); packageVersion("tidyverse")
 library(vegan); packageVersion("vegan")
 library(phyloseq); packageVersion("phyloseq")
 library(broom); packageVersion("broom")
-library(janitor)
+library(janitor); packageVersion("janitor")
 
 # functions
-source("./R/helper_functions.R")
 source("./R/theme.R")
 
 # DATA ####
@@ -58,17 +58,14 @@ df <- left_join(df, uv_merge, by = "location")
 
 
 # FINAL CSV ####
-# need a sample column and UV column
-# exporting to csv to turn in 
 
 final <- df %>% select("sample", "uv_month_avg")
-write.csv(final, file = "./output/morelli_meta.csv", row.names = FALSE)
+write.csv(final, file = "./data/morelli_meta.csv", row.names = FALSE)
 
 # EXPLORING ####
 uv %>% ggplot(aes(x = DY, y = ALLSKY_SFC_UV_INDEX)) +
   geom_point() +
   facet_wrap(~ location) 
-
 
 uv %>% ggplot(aes(x = DY, y = ALLSKY_SFC_UV_INDEX, color = location)) +
   geom_line() +

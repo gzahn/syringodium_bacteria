@@ -40,7 +40,7 @@ dates$Host <- NULL
 
 # Load precipitation data and clean ####
 precip_data <- read_csv("./data/Precip_raw.csv") %>% 
-  rename(Collection_Date = DATE) %>% 
+  dplyr::rename(Collection_Date = DATE) %>% 
   select(c(NAME, LATITUDE, LONGITUDE, Collection_Date, PRCP))
 
 # Match the format of dates to the metadata dates
@@ -126,7 +126,7 @@ clean_meta <-
 clean_meta <- 
   clean_meta %>% 
   select(Precipitation,`Library Name`) %>% 
-  rename(sample = `Library Name`)
+  dplyr::rename(sample = `Library Name`)
 
 
 # 192 samples in the ps@sam_data
@@ -269,5 +269,5 @@ clean_meta <- clean_meta[!grepl("Natuna", clean_meta$sample),]
 clean_meta <- clean_meta[!grepl("Sanur", clean_meta$sample),]
 
 # If you want to save the clean dataset
-##write_csv(x = clean_meta, file = "./output/precip_metadata.csv")
+write_csv(x = clean_meta, file = "./data/precip_metadata.csv")
 

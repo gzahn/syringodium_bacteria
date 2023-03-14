@@ -131,6 +131,30 @@ ps <- phyloseq(otu_table(ps@otu_table),
          phy_tree(ps@phy_tree),
          new_metadata)
 
+## monthly precipitation ####
+source("./R/Leon_metadata.R")
+precip <- read_csv("./data/precip_metadata.csv")
+new_metadata <- precip %>% 
+  full_join(microbiome::meta(ps)) %>% 
+  sample_data()
+sample_names(new_metadata) <- new_metadata$sample
+ps <- phyloseq(otu_table(ps@otu_table),
+               tax_table(ps@tax_table),
+               phy_tree(ps@phy_tree),
+               new_metadata)
+
+## elevation ####
+elev <- read_csv("./data/elevation_data.csv")
+new_metadata <- elev %>%
+  dplyr::rename("sample" = "sample_name") %>% 
+  full_join(microbiome::meta(ps)) %>% 
+  sample_data()
+sample_names(new_metadata) <- new_metadata$sample
+ps <- phyloseq(otu_table(ps@otu_table),
+               tax_table(ps@tax_table),
+               phy_tree(ps@phy_tree),
+               new_metadata)
+
 
 
 # Save RDS object for cleaned up Phyloseq object

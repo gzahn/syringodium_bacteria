@@ -62,7 +62,7 @@ df <- left_join(df, uv_merge, by = "location")
 final <- df %>% select("sample", "uv_month_avg")
 write.csv(final, file = "./data/morelli_meta.csv", row.names = FALSE)
 
-# EXPLORING ####
+# LOOKING AROUND ####
 uv %>% ggplot(aes(x = DY, y = ALLSKY_SFC_UV_INDEX)) +
   geom_point() +
   facet_wrap(~ location) 

@@ -119,9 +119,27 @@ behlee_ao_wp_loc<-full_join(fdate, behlee_meta)
 
 # to make it easier to use with our phyloseq object, we can select just the new metadata and the sample names 
 wp_ao_id<-behlee_ao_wp_loc %>% select(`Library Name`, mean_ao, wp)
-behlee_wpao_id<-wp_ao_id %>% rename("sample" = "Library Name")
+behlee_wpao_id<-wp_ao_id %>% dplyr::rename("sample" = "Library Name")
 
+# wp is a character at this point, so we need to change it to numeric so we can do actual stuff with it
+behlee_wpao_id$wp<-as.numeric(behlee_wpao_id$wp)
+
+# wp and ao are only relevant to our data if we consider them in tandem. 
+  # we need to find where both ao and wp are positive because that is when there are associations with temperature anomalies in south Asia 
+    # to do this I need to do match pattern to do if the first one is positive, and the second one is also positive then return true
+behlee_wpao_id_pos_wp<-behlee_wpao_id %>% 
+  mutate(positive_wp=case_when((wp) > 0 ~ TRUE, 
+                               TRUE ~ FALSE))
+
+
+anomalies_and_othe_stuff<-behlee_wpao_id_pos_wp %>% 
+  mutate(positive_ao=case_when(mean_ao > 0 ~ TRUE,
+                               TRUE~FALSE), 
+         temp_anomalies=case_when(positive_ao & positive_wp == TRUE ~ TRUE, 
+                                  TRUE ~ FALSE))
+
+temp_anomalies<-anomalies_and_othe_stuff %>% select(sample, temp_anomalies) %>% data.frame()
 
 # lets write it as a csv for easy access later 
-write_csv(behlee_wpao_id, "./data/behlee_ao_wp_id_metadata.csv")
+write_csv(temp_anomalies, "./data/BA_temp_anomalies_metadata.csv")
 

@@ -1,0 +1,11 @@
+﻿genus,respiration,motility,spore_forming,gram_stain,shape
+Azonexus,aerobic,Y,N,negative,rod
+Bradyrhizobium,aerobic,Y,N,negative,rod
+Elizabethkingia,aerobic,N,N,negative,NA
+Marixanthomonas,aerobic,N,N,negative,rod
+Mucilaginibacter,aerobic,N,NA,negative,rod
+Rhizobium,aerobic,Y,N,negative,rod
+Rhodospirrilum,aerobic,Y,N,negative,spiral
+Sphingomonas,aerobic,Y,N,negative,rod
+Vibrionimonas,aerobic,Y,NA,negative,rod
+Wandonia,aerobic,Y,NA,negative,rod

@@ -144,6 +144,56 @@ bbd %>%
 ```
 
 
+
+
 <br>
+
+___
+
+# Bacterial morphology
+
+Bacterial genera traits were pulled from BacDive.
+
+
+## Cell size
+
+Table X: Trait information for significant genera
+
+```{r}
+read_csv("./significant_taxa_traits_kh.csv") %>% 
+  kableExtra::kable() %>% 
+  kableExtra::kable_classic(lightable_options = 'hover')
+```
+
+
+Distributions of cell dimensions and shapes for significant taxa were compared to the overall distributions for all detected taxa.
+
+```{r, fig.cap="Comparitive distributions of minimum cell dimensions"}
+knitr::include_graphics("./figs/minimum_cell_dimension_distribution.png")
+```
+
+GLM model for minimum dimension distribution:
+
+```{r}
+dim_mod <- readRDS("./cell_dimension_glm.RDS")
+xsqtest <- readRDS("./cell_shape_xsq.RDS")
+dim_mod$formula
+dim_mod %>% 
+  broom::tidy() %>% 
+  kableExtra::kable() %>% 
+  kableExtra::kable_classic(lightable_options = 'hover')
+```
+
 <br>
+
+## Cell shape
+
+Chi-square test results for significant taxa cell shapes:
+
+```{r}
+xsqtest
+```
+There is no apparent enrichment in cell shape morphology in significant taxa
+
+
 <br>

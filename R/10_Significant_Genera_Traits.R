@@ -190,7 +190,10 @@ for(i in genus_list){
   morph_list[[i]] <- df
 }  
 saveRDS(morph_list,"./output/genus_morphology_data.RDS")
+morph_list <- readRDS("./output/genus_morphology_data.RDS")
+
 names(morph_list)
+# morph_list <- readRDS("./output/genus_morphology_data.RDS")
 
 # reduce to single data frame
 morphology <- purrr::reduce(morph_list,full_join)
@@ -222,6 +225,21 @@ morphology <- morphology %>%
          est_surface_area = case_when(shape == "coccus" ~ 4*pi*((min_dimension/2)^2),
                                   shape != "coccus" ~ (2*pi*((min_length/2)^2))))
 
+morphology %>% 
+  dplyr::filter(signifigant_taxa) %>% 
+  group_by(genus) %>% 
+  summarize(Avg_Min = mean(min_length,na.rm=TRUE))
+  write_csv("./output/significant_taxa_traits.csv")
+
+  
+morphology %>% 
+  dplyr::filter(signifigant_taxa) %>% 
+  mutate(length=length %>% str_remove(" µm") %>% str_split("-") %>% map_chr(1) %>% as.numeric,
+         width=width %>% str_remove(" µm") %>% str_split("-") %>% map_chr(1) %>% as.numeric) %>% 
+  group_by(genus) %>% 
+  summarize(mean_length=mean(length,na.rm=TRUE),
+            mean_width=mean(width,na.rm=TRUE))
+  
 # distribution plots
 morphology %>% 
   ggplot(aes(x=min_dimension, fill = signifigant_taxa)) +
@@ -235,13 +253,18 @@ ggsave("./output/figs/minimum_cell_dimension_distribution.png",
 # minimum dimension is important for Reynold's Number
 mod <- glm(data=morphology,
            formula = min_dimension ~ signifigant_taxa)
-
+saveRDS(mod,"./output/cell_dimension_glm.RDS")
 sink("./output/cell_min_dimension_glm_summary.txt")
 mod %>% summary()
 sink(NULL)
 report::report(mod)
 morphology
 # Chi-Square test for enrichment in cell shape for significant taxa
+
+xsqtest <- table(morphology$shape, morphology$signifigant_taxa) %>% 
+  chisq.test()
+saveRDS(xsqtest,"./output/cell_shape_xsq.RDS")
+
 sink("./output/cell_shape_chi-sq_test.txt")
 print("Genus significance and shape")
 table(morphology$shape, morphology$signifigant_taxa)
@@ -272,3 +295,9 @@ sink(NULL)
 
 # export morphology database
 write_csv(morphology)
+
+
+
+
+morphology %>% 
+  filter(genus == "Vibrionimonas")

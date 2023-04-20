@@ -2,6 +2,9 @@
 
 This codebase is part of the **Microbiome Boot Camp** course at Utah Valley University. 
 
+[Latest released version](https://doi.org/10.5281/zenodo.7729693) can be found on Zenodo
+
+
 ![./media/syringodium_wikimedia.jpeg](./media/syringodium_wikimedia.jpeg)
 
 -- *Syringodium isoetifolium* meadow (Wiki commons)

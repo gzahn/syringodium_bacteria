@@ -21,6 +21,7 @@ library(phyloseq); packageVersion("phyloseq")
 library(patchwork); packageVersion("patchwork")
 library(geodist); packageVersion("geodist")
 library(broom); packageVersion("broom")
+library(lmerTest); packageVersion('lmerTest')
 
 # seed
 set.seed(061223)
@@ -74,7 +75,7 @@ unifrac_plot <- plot_ordination(ps,UFORD,color = "east_west") +
 bray_plot + unifrac_plot + 
   plot_layout(guides = "collect") & 
   theme(legend.position = 'bottom')
-ggsave("./output/figs/ordination_plots.png",dpi=300,height = 6, width = 10)
+ggsave("./output/figs/ordination_plots.png",dpi=300,height = 6, width = 12)
 # PERMANOVA ####
 
 # specify model tables for Supplementary Info
@@ -84,14 +85,14 @@ vegan::adonis2(ps %>%
                  transform_sample_counts(function(x){x/sum(x)}) %>% 
                  otu_table() ~ 
                  ps@sam_data$east_west + 
-                 ps@sam_data$location) %>% 
+                 ps@sam_data$location,strata = ps@sam_data$east_west) %>% 
   broom::tidy() %>% 
   saveRDS("./output/bray_betadiv_df.RDS")
 
 # UniFrac permanova
 adonis2(UF ~ 
           ps@sam_data$east_west + 
-          ps@sam_data$location) %>% 
+          ps@sam_data$location,strata = ps@sam_data$east_west) %>% 
   broom::tidy() %>% 
   saveRDS("./output/unifrac_betadiv_df.RDS")
 
@@ -119,23 +120,4 @@ vegan::betadisper(UF,ps@sam_data$east_west,type = 'centroid') %>%
 
 # EXTRA STUFF? ####
 
-
-# plot distance matrices
-data.frame(unifrac=c(UF),
-           gps=c(gps_dist)) %>% 
-  ggplot(aes(x=gps,y=unifrac)) +
-  geom_point(alpha=.1) +
-  geom_smooth(method="lm") +
-  labs(title = "Unifrac distance vs positional distance")
-
-
-
-
-
-# slope of linear model line
-data.frame(unifrac=c(UF),
-           gps=c(gps_dist)) %>% 
-  glm(data = .,
-      formula = unifrac ~ gps) %>% 
-  coef()
 

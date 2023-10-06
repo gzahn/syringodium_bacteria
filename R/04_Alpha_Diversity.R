@@ -7,6 +7,7 @@
 #                     vegan v 2.6.4
 #                     phyloseq v 1.42.0
 #                     broom v 1.0.3
+#                     lmerTest v 3.1.3
 # -----------------------------------------------------------------------------#
 
 # SETUP ####
@@ -16,6 +17,7 @@ library(tidyverse); packageVersion("tidyverse")
 library(vegan); packageVersion("vegan")
 library(phyloseq); packageVersion("phyloseq")
 library(broom); packageVersion("broom")
+library(lmerTest); packageVersion("lmerTest")
 
 # functions
 source("./R/helper_functions.R")
@@ -60,8 +62,11 @@ alpha$island <- ps@sam_data$location
 mod_observed <- glm(data=alpha,
                     formula = Observed ~ east_west * island)
 
+m2 <- lmer(data=alpha,
+     formula = Observed ~ east_west + (1|island))
 sink("./output/alpha_mod_observed_summary.txt")
-summary(mod_observed)
+summary(m2)
+report::report(m2)
 sink(NULL)
 
 
@@ -69,16 +74,14 @@ broom::tidy(mod_observed) %>%
   filter(p.value<0.05)
 
 # glm shannon
-mod_shannon <- glm(data=alpha,
-                    formula = Shannon ~ east_west * island)
-broom::tidy(mod_shannon) %>% 
-  saveRDS("./output/shannon_div_df.RDS")
+mod_shannon <- lmer(data=alpha,
+                   formula = Shannon ~ east_west + (1|island))
+
 
 sink("./output/alpha_mod_shannon_summary.txt")
 summary(mod_shannon)
+report::report(mod_shannon)
 sink(NULL)
-
-report::report(mod_observed)
 
 
 # Merge at location level ####

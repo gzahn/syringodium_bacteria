@@ -60,8 +60,10 @@ data.frame(haversine = haversine_dist %>% as.matrix() %>% c(),
   ggplot(aes(x=haversine,y=asv)) +
   geom_point() +
   geom_smooth(se=FALSE) +
-  labs(y="Community distance",x="Haversine distance (m)")
+  labs(y="Community dissimilarity",x="Haversine distance (m)")
 ggsave("./output/figs/comm_dist_vs_spatial_dist.png",dpi=300,height=4,width = 4)
+
+
 
 # UNIFRAC DISTANCE
 # GeoSphere sample distance vs UniFrac distance
@@ -88,7 +90,7 @@ data.frame(unifrac=c(UF),
   geom_point(alpha=.05) +
   geom_smooth() +
   labs(x="Spatial distance (m)",
-       y="Community distance (UniFrac)")
+       y="Community dissimilarity (UniFrac)")
 
 ggsave("./output/figs/comm_dist_vs_spatial_dist_unifrac.png",
        dpi=300,height = 6,width = 6)

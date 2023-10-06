@@ -18,7 +18,7 @@ library(vegan); packageVersion("vegan")
 library(phyloseq); packageVersion("phyloseq")
 library(ggraph); packageVersion("ggraph")
 library(ggmap); packageVersion("ggmap")
-readRenviron("~/.Renviron")
+readLines("~/.Renviron")
 
 # functions
 source("./R/helper_functions.R")
@@ -145,8 +145,8 @@ lay_plot$weight <- lay_plot$relative_weight / nrow(lay_plot)
 
 ggmap::ggmap(area) +
   geom_segment(aes(x=114.8,y=-11,xend=122,yend=6),linetype=2,linewidth=.25,color="red") +
-  ggraph::geom_edge_link(data = lay_plot %>% mutate("Vertex weight" = weight),
-                         aes(colour=`Vertex weight`),
+  ggraph::geom_edge_link(data = lay_plot %>% mutate("Edge weight" = weight),
+                         aes(colour=`Edge weight`),
                          show.legend=TRUE) +
   geom_point(data = lay_plot, aes(x=node1.x,
                                   y=node1.y,

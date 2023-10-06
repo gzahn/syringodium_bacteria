@@ -225,6 +225,8 @@ morphology <- morphology %>%
          est_surface_area = case_when(shape == "coccus" ~ 4*pi*((min_dimension/2)^2),
                                   shape != "coccus" ~ (2*pi*((min_length/2)^2))))
 
+saveRDS(morphology,"./output/cell_morphology_data.RDS")
+ps@sam_data
 morphology %>% 
   dplyr::filter(signifigant_taxa) %>% 
   group_by(genus) %>% 

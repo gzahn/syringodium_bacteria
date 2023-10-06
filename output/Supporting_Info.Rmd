@@ -1,5 +1,5 @@
 ---
-title: "Supporting Tables"
+title: "Supporting Information"
 output: 
   html_document:
     toc: yes
@@ -21,7 +21,7 @@ ___
 
 <br>
 
-# Alpha-Diversity
+# Appendix S1: Alpha-Diversity
 
 ```{r}
 shannon <- readRDS("./shannon_div_df.RDS") %>% 
@@ -42,7 +42,7 @@ ___
 
 <br>
 
-# Beta-Diversity 
+# Appendix S2: Beta-Diversity 
 
 ### PermANOVA Tables:
 
@@ -103,7 +103,7 @@ ___
 
 <br>
 
-# Distance Decay
+# Appendix S3: Distance Decay
 
 ### Multiple Regression on Matrices
 
@@ -129,7 +129,7 @@ ___
 
 <br>
 
-# Differential Abdundance
+# Appendix S4: Differential Abdundance
 
 
 ```{r}
@@ -150,7 +150,7 @@ bbd %>%
 
 ___
 
-# Bacterial morphology
+# Appendix S5: Bacterial morphology
 
 Bacterial genera traits were pulled from BacDive.
 
@@ -195,5 +195,30 @@ xsqtest
 ```
 There is no apparent enrichment in cell shape morphology in significant taxa
 
-
 <br>
+
+## Cell morphology data
+
+Data extracted from [BacDive](https://bacdive.dsmz.de/)
+
+```{r}
+readRDS("./cell_morphology_data.RDS") %>% 
+  select(-c(est_vol,est_surface_area)) %>% 
+  kableExtra::kable() %>% 
+  kableExtra::kable_classic(lightable_options = "hover") %>% 
+  kableExtra::scroll_box(height = '600px')
+```
+<br>
+
+# Appendix S6: Sample metadata
+
+```{r}
+readxl::read_xlsx("../data/SI_Indo_Metadata_CorrectGPS.xlsx") %>% 
+  dplyr::select(-Barcode) %>% 
+  kableExtra::kable() %>% 
+  kableExtra::kable_classic(lightable_options = "hover") %>% 
+  kableExtra::scroll_box(height = '600px')
+```
+
+
+<br><br><br>

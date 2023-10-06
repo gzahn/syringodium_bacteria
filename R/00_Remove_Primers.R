@@ -77,7 +77,7 @@ rbind(FWD.ForwardReads = sapply(FWD.orients, primerHits, fn = fnFs.filtN[[1]]),
 # If the following command returns an error, you do not have cutadapt installed correctly
 system2("cutadapt", args = "--version")
 
-path.cut <- file.path("./data", "cutadapt")
+path.cut <- file.path(path, "cutadapt")
 if(!dir.exists(path.cut)) dir.create(path.cut)
 fnFs.cut <- file.path(path.cut, basename(fnFs))
 fnRs.cut <- file.path(path.cut, basename(fnRs))

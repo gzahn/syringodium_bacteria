@@ -1,9 +1,9 @@
 # intermediate data etc
-./data/fintN/*
-./data/cutadapt/*
-./data/filtered/*
-./data/raw/*
-./manuscript/*
+./data/fintN
+./data/cutadapt
+./data/filtered
+./data/raw
+./manuscript
 
 
 # History files
@@ -45,4 +45,3 @@ vignettes/*.pdf
 
 # R Environment Variables
 .Renviron
-data/filtN/*

@@ -5,7 +5,6 @@
 ./data/raw
 ./manuscript
 
-
 # History files
 .Rhistory
 .Rapp.history

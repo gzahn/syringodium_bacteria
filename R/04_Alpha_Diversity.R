@@ -17,7 +17,7 @@ library(tidyverse); packageVersion("tidyverse")
 library(vegan); packageVersion("vegan")
 library(phyloseq); packageVersion("phyloseq")
 library(broom); packageVersion("broom")
-library(lmerTest); packageVersion("lmerTest")
+library(lmerTest,lib.loc = "/home/geoff/R/x86_64-pc-linux-gnu-library/4.2"); packageVersion("lmerTest")
 
 # functions
 source("./R/helper_functions.R")
@@ -58,22 +58,25 @@ alpha$island <- ps@sam_data$location
 
 # MODELING ####
 
-# glm richness
-mod_observed <- glm(data=alpha,
-                    formula = Observed ~ east_west * island)
+# richness
+# mod_observed <- glm(data=alpha,
+#                     formula = Observed ~ east_west * island)
 
 m2 <- lmer(data=alpha,
      formula = Observed ~ east_west + (1|island))
+saveRDS(m2,"./output/lmer_mod_alpha.RDS")
+
+
 sink("./output/alpha_mod_observed_summary.txt")
 summary(m2)
 report::report(m2)
 sink(NULL)
-
+lme4::lmer
 
 broom::tidy(mod_observed) %>% 
   filter(p.value<0.05)
 
-# glm shannon
+# shannon
 mod_shannon <- lmer(data=alpha,
                    formula = Shannon ~ east_west + (1|island))
 

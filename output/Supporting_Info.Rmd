@@ -29,10 +29,12 @@ shannon <- readRDS("./shannon_div_df.RDS") %>%
          term = term %>% str_remove("West"))
 
 
-shannon %>% 
-  kable(caption = "SI Table 1. Shannon Diversity GLM. Bold indicates P-value less than 0.05") %>% 
-  kable_classic(lightable_options = 'striped') %>% 
-  row_spec(which(shannon$p.value < 0.05), bold = TRUE)
+readLines("../output/alpha_mod_observed_summary.txt")
+
+#shannon %>% 
+ # kable(caption = "SI Table 1. Shannon Diversity GLM. Bold indicates P-value less than 0.05") %>% 
+  #kable_classic(lightable_options = 'striped') %>% 
+  #row_spec(which(shannon$p.value < 0.05), bold = TRUE)
 ```
 
 
@@ -123,6 +125,13 @@ readRDS("../output/mantel_table.RDS") %>%
 
 ```
 
+### Distance decay plot
+
+```{r}
+knitr::include_graphics("../output/figs/comm_dist_vs_spatial_dist.png")
+```
+
+
 <br>
 
 ___
@@ -132,13 +141,30 @@ ___
 # Appendix S4: Differential Abdundance
 
 
+### ASV-level
+
+```{r}
+bbd <- readRDS("../output/bbdml_significant_mod_tables_ASV.RDS")
+bbd %>% 
+  mutate(across(where(is.numeric),function(x){round(x,4)})) %>% 
+  kable(caption = "SI Table 7a. BBDML model estimates from all significant ASVs (including ASV sequence).") %>% 
+  kable_classic(lightable_options = 'striped') %>% 
+  scroll_box(height = 300)
+
+
+```
+
+
+
+### Genus-level
 ```{r}
 bbd <- readRDS("../output/bbdml_significant_mod_tables.RDS")
 
 bbd %>% 
   mutate(across(where(is.numeric),function(x){round(x,4)})) %>% 
-  kable(caption = "SI Table 7. BBDML model estimates from all significant genera (from corncob).") %>% 
-  kable_classic(lightable_options = 'striped')
+  kable(caption = "SI Table 7b. BBDML model estimates from all significant genera (from corncob).") %>% 
+  kable_classic(lightable_options = 'striped') %>% 
+  scroll_box(height = 300)
 
 
 ```

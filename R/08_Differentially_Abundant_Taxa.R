@@ -34,6 +34,7 @@ library(vip); packageVersion("vip")
 
 # Helper functions
 source("./R/bbdml_helper.R")
+source("./R/theme.R")
 
 # Random seed
 set.seed(123)
@@ -58,6 +59,7 @@ genus_taxa <- otu_to_taxonomy(genus_names,ps_genus,level = c("Phylum","Class","O
 
 # CORNCOB DIFFABUND ####
 
+# At genus-level taxonomy (glommed)
 # use raw count data for corncob
 da_analysis_eastwest <- differentialTest(formula = ~ east_west, #abundance
                                          phi.formula = ~ 1, #dispersion
@@ -70,8 +72,21 @@ da_analysis_eastwest <- differentialTest(formula = ~ east_west, #abundance
 plot(da_analysis_eastwest) +
   theme(legend.position = 'none')
 
-# pull model info out for reporting
-mods <- da_analysis_eastwest$significant_models
+# At ASV-level
+# use raw count data for corncob
+da_analysis_eastwest_ASV <- differentialTest(formula = ~ east_west, #abundance
+                                         phi.formula = ~ 1, #dispersion
+                                         formula_null = ~ 1, #mean
+                                         phi.formula_null = ~ 1,
+                                         test = "Wald", boot = FALSE,
+                                         data = ps,
+                                         fdr_cutoff = 0.05,
+                                         full_output = TRUE)
+plot(da_analysis_eastwest_ASV) +
+  theme(legend.position = 'none', axis.text.y = element_blank())
+
+# pull model info out for reporting significant ASVs
+mods <- da_analysis_eastwest_ASV$significant_models
 
 capture_mods <- function(x){
  y <- x$coefficients %>% 
@@ -87,17 +102,27 @@ capture_mods <- function(x){
 bbdml_mods <- map(mods,capture_mods)
 
 # find the significant taxa
-da_analysis_eastwest$significant_taxa
-sig_taxa <- da_analysis_eastwest$significant_taxa %>% otu_to_taxonomy(data=ps_genus)
+da_analysis_eastwest_ASV$significant_taxa
+sig_taxa <- da_analysis_eastwest_ASV$significant_taxa %>% otu_to_taxonomy(data=ps)
 
 names(bbdml_mods) <- sig_taxa
 joined_mods <- bbdml_mods %>% 
+  purrr::map(as.data.frame) %>% 
   purrr::reduce(full_join)
 joined_mods$taxon <- names(bbdml_mods)
 joined_mods <- joined_mods %>% 
-  select(taxon,estimate,std_error,t_value,p_value)
+  select(taxon,estimate,std_error,t_value,p_value) %>% 
+  mutate(ASV=da_analysis_eastwest_ASV$significant_taxa)
 joined_mods %>%
-  saveRDS("./output/bbdml_significant_mod_tables.RDS")
+  saveRDS("./output/bbdml_significant_mod_tables_ASV.RDS")
+
+
+# export plot for Supplemental Info
+plot(da_analysis_eastwest_ASV) +
+  theme(legend.position = 'none', axis.text.y = element_blank())
+ggsave("./output/figs/ASV-level_Diffabund_Plot.png",dpi=300,height=6,width=10)
+
+
 
 # run bbdml() on all significant taxa
 bbdml_obj <- multi_bbdml(da_analysis_eastwest,
@@ -107,8 +132,8 @@ bbdml_obj <- multi_bbdml(da_analysis_eastwest,
                          taxlevels = 6)
 
 
-# # filter significant taxa to only those with absolute effect sizes > 1.5
-# is that unit log odds???
+# # filter significant taxa to only those with absolute effect sizes > 1.5 (log-odds)
+
 
 find_mu <- function(x,mu=1.5){
   y <- x$b.mu[2]
@@ -121,13 +146,15 @@ names(new_bbdml_obj)
 
 
 # INDICSPECIES ####
-comm <- ps_genus %>% 
+comm <- ps %>% 
   transform_sample_counts(function(x){x/sum(x)}) %>% 
   otu_table() %>% as("matrix")
-base::colnames(comm) <- genus_taxa
+base::colnames(comm) <- ASV_taxa
 
-groups <- ps_genus@sam_data$east_west
+groups <- ps@sam_data$east_west
 
+# deal with duplicated column names (multiple ASVs with same taxon names)
+colnames(comm) <- paste(1:length(colnames(comm)),colnames(comm),sep=";")
 # multipatt analysis
 indval <- indicspecies::multipatt(comm,
                                   groups,
@@ -137,21 +164,26 @@ summary(indval)
 
 # pull genus names of taxa that indicate EITHER East or West
 x <- row.names(indval$A)
-indicspecies_taxa <- x[which(indval$sign$p.value < 0.05)] %>% 
-                      str_split("_") %>% 
-                      map_chr(5)
+
+
+indicspecies_taxa <- x[which(indval$sign$p.value < 0.05)] %>%
+                      str_replace("incertae_sedis","incertaesedis") %>% 
+                      str_split("_") 
+indicspecies_taxa <- lapply(indicspecies_taxa, `length<-`, max(lengths(indicspecies_taxa)))
+indicspecies_taxa <- indicspecies_taxa %>% 
+                       map_chr(5)
 # RANDOM FOREST ####
 # use relative abundance transformations for Ranger
-ps_genus <- ps_genus %>% 
+ps_genus <- ps %>% 
   transform_sample_counts(function(x){x/sum(x)})
 
 # get data ready for RF modeling
-meta <- microbiome::meta(ps_genus) %>% 
+meta <- microbiome::meta(ps) %>% 
   select(east_west) %>% 
   mutate(east = case_when(east_west == "East" ~ TRUE, # east is logical response
                           east_west == "West" ~ FALSE)) %>% 
   select(east)
-asv <- otu_table(ps_genus) %>% 
+asv <- otu_table(ps) %>% 
   as("matrix") %>% 
   as.data.frame()
 df <- 
@@ -163,7 +195,20 @@ ranger_model <- ranger::ranger(east~.,
                                classification = TRUE, 
                                probability = TRUE,
                                importance = 'permutation')
-# find top important taxa
+
+# how many top "vip" taxa should we select?
+# find point at which variable importance from one place to the next drops (inflection point of exponential curve)
+10^(lag(vip::vi(ranger_model)$Importance) - vip::vi(ranger_model)$Importance) %>% plot
+(vip::vi(ranger_model)$Importance %>% cumsum() %>% round(3) -
+    vip::vi(ranger_model)$Importance %>% cumsum() %>% round(3) %>% lag()) %>% head(30)
+
+# top 20 capture all importance from the taxa (variables)
+vip::vi(ranger_model) %>% 
+  ggplot(aes(x=1:ntaxa(ps),y=Importance)) +
+  geom_point() +
+  geom_vline(xintercept = 20,linetype=2,color="red")
+
+# find top important taxa with discriminatory power for model 
 top <- vip::vip(ranger_model,num_features=20) # find most important factors for success (survival)
 top +
   theme(axis.text.y = element_blank())
@@ -194,7 +239,10 @@ new_bbdml_obj <- new_bbdml_obj[which(names(new_bbdml_obj) %in% indicspecies_taxa
 
 # also subset bbdml tests to those found by Ranger as well
 vip_taxa <- vip_taxa %>% 
-  str_split("_") %>% 
+  str_replace("incertae_sedis","incertaesedis") %>% 
+  str_split("_") 
+vip_taxa <- lapply(vip_taxa, `length<-`, max(lengths(vip_taxa)))
+vip_taxa <- vip_taxa %>% 
   map_chr(6)
 new_bbdml_obj <- new_bbdml_obj[which(names(new_bbdml_obj) %in% vip_taxa)]
 
@@ -207,7 +255,7 @@ new_bbdml_obj %>%
 plot_multi_bbdml(new_bbdml_obj,
                  color="east_west", 
                  pointsize = 3)
-
+bbdml_plot_1;bbdml_plot_2;bbdml_plot_3;bbdml_plot_4;bbdml_plot_5;bbdml_plot_6;bbdml_plot_7
 # save plots as RDS objects
 plots <- ls(pattern = "bbdml_plot_")
 for(i in plots){
@@ -229,48 +277,55 @@ plots <- ls(pattern = "^bbdml_plot_")
 
 p1 <- bbdml_plot_1 +
   labs(color="East or West of\nWallace's Line") +
+  scale_color_manual(values = pal.discrete) +
   theme(legend.position = 'none',
         axis.title.y = element_blank())
 p2 <- bbdml_plot_2 +
   labs(color="East or West of\nWallace's Line") +
+  scale_color_manual(values = pal.discrete) +
   theme(axis.title.y = element_blank(),
         legend.position = 'none')
 p3 <- bbdml_plot_3 +
   labs(color="East or West of\nWallace's Line") +
+  scale_color_manual(values = pal.discrete) +
   theme(axis.title.y = element_blank(),
         legend.position = 'none')
 p4 <- bbdml_plot_4 +
   labs(color="East or West of\nWallace's Line") +
+  scale_color_manual(values = pal.discrete) +
   theme(axis.title.y = element_blank(),
         legend.position = 'none')
 p5 <- bbdml_plot_5 +
   labs(y="Relative\nabundance",
        color="East or West of\nWallace's Line") +
+  scale_color_manual(values = pal.discrete) +
   theme(legend.position = 'none')
 p6 <- bbdml_plot_6 +
   labs(color="East or West of\nWallace's Line") +
+  scale_color_manual(values = pal.discrete) +
   theme(axis.title.y = element_blank(),
         legend.position = 'none') 
 p7 <- bbdml_plot_7 +
   labs(color="East or West of\nWallace's Line") +
+  scale_color_manual(values = pal.discrete) +
   theme(axis.title.y = element_blank(),
         legend.position = 'none')
-p8 <- bbdml_plot_8 +
-  labs(color="East or West of\nWallace's Line") +
-  theme(axis.title.y = element_blank(),
-        legend.position = 'none')
-p9 <- bbdml_plot_9 +
-  labs(color="East or West of\nWallace's Line") +
-  theme(legend.position = 'none',
-        axis.title.y = element_blank())
-p10 <- bbdml_plot_10 +
-  labs(color="East or West of\nWallace's Line") +
-  theme(axis.title.y = element_blank())
+# p8 <- bbdml_plot_8 +
+#   labs(color="East or West of\nWallace's Line") +
+#   theme(axis.title.y = element_blank(),
+#         legend.position = 'none')
+# p9 <- bbdml_plot_9 +
+#   labs(color="East or West of\nWallace's Line") +
+#   theme(legend.position = 'none',
+#         axis.title.y = element_blank())
+# p10 <- bbdml_plot_10 +
+#   labs(color="East or West of\nWallace's Line") +
+#   theme(axis.title.y = element_blank())
 
 
 
 
-(p1 + p2) / (p3 + p4) / (p5 + p6) / (p7 + p8) / (p9 + p10) +
+(p1 + p2) / (p3 + p4) / (p5 + p6) / (p7 + plot_spacer()) +
   plot_layout(guides = "collect") & 
   theme(legend.position = 'bottom')
 ggsave("./output/figs/differential_abundance_sig_taxa.png", height = 8, width = 10,dpi=300)

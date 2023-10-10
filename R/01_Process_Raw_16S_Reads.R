@@ -213,13 +213,13 @@ saveRDS(meta,"./data/metadata_for_taxonomy.RDS")
 # ASSIGN TAXONOMY ####
 
 # Use RDP training set for 16S
-taxa <- assignTaxonomy(seqtab.nochim, "./taxonomy/rdp_train_set_16.fa.gz", multithread=4)
+taxa <- assignTaxonomy(seqtab.nochim, "./taxonomy/rdp_train_set_18.fa.gz", multithread=4)
 
 # Save intermediate taxonomy file
 saveRDS(taxa, file = "./output/RDP_Taxonomy_from_dada2.RDS")
 
 # add_species names
-taxa <- addSpecies(taxa, "./taxonomy/rdp_species_assignment_16.fa.gz")
+taxa <- addSpecies(taxa, "./taxonomy/rdp_species_assignment_18.fa.gz")
 
 # Save completed taxonomy file
 saveRDS(taxa, file = "./output/RDP_Taxonomy_from_dada2_sp.RDS")

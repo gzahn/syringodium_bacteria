@@ -78,7 +78,7 @@ net <- make_network(ps %>%
                       transform_sample_counts(function(x){x/sum(x)}),
                     keep.isolates = TRUE,max.dist = 1-maxdist,distance = "bray")
 
-
+?make_network
 # overlay on map
 node.pos <- 
   data.frame(

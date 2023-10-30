@@ -45,6 +45,23 @@ gps_dist <- vegdist(meta %>% select(lat,lon),
 
 # same thing, but in meters
 haversine_dist <- geodist(meta %>% select(lon,lat),measure = "geodesic") %>% as.dist()
+haversine_dist %>% as.data.frame() %>% dim
+haversine = haversine_dist %>% as.matrix() %>% c()
+meta %>% select(lon,lat) %>% dim
+# make "distance" matrix showing whether every pair of samples is within or across WL
+
+z <- logical()
+x <- meta$east_west
+full_list <- list()
+for(i in seq_along(x)){
+  z <- (x[i] == x)
+  full_list[[i]] <- z
+}
+
+
+x.df <- full_list %>% as.data.frame()
+names(x.df) <- seq_along(x)
+x.df %>% unlist
 
 # MRM ####
 # Multiple regression on matrices
@@ -54,14 +71,22 @@ mrm_haversine %>% as.data.frame() %>%
   mutate(coef.asv_dist = coef.asv_dist %>% round(3),
          r.squared = r.squared %>% round(3)) %>% 
   saveRDS("./output/MRM_table.RDS")
+
+
 # plot
 data.frame(haversine = haversine_dist %>% as.matrix() %>% c(),
-           asv = asv_dist %>% as.matrix() %>% c()) %>% 
+           asv = asv_dist %>% as.matrix() %>% c(),
+           comparison = !(x.df %>% unlist)) %>% # add comparison type for plot
+  mutate(comparison = case_when(comparison ~ "Across WL",
+                                comparison == FALSE ~ "Within WL")) %>% 
   ggplot(aes(x=haversine,y=asv)) +
-  geom_point() +
-  geom_smooth(se=FALSE) +
-  labs(y="Community dissimilarity",x="Haversine distance (m)")
-ggsave("./output/figs/comm_dist_vs_spatial_dist.png",dpi=300,height=4,width = 4)
+  geom_jitter(aes(color=comparison),alpha=.5,width = .05) +
+  geom_smooth(se=FALSE,color='red') +
+  labs(y="Community dissimilarity",x="Haversine distance (m)",
+       color="Community\ncomparison") +
+  scale_color_manual(values=pal.discrete) +
+  theme(legend.position = 'top')
+ggsave("./output/figs/comm_dist_vs_spatial_dist.png",dpi=300,height=4,width = 6)
 
 
 

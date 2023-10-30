@@ -329,3 +329,46 @@ p7 <- bbdml_plot_7 +
   plot_layout(guides = "collect") & 
   theme(legend.position = 'bottom')
 ggsave("./output/figs/differential_abundance_sig_taxa.png", height = 8, width = 10,dpi=300)
+
+# Abundance of diffabund taxa
+diff_taxa_samples <- 
+ps %>% 
+  transform_sample_counts(function(x){x/sum(x)}) %>% 
+  subset_taxa(Genus %in% c("Mucilaginibacter",
+                           "Rhizobium",
+                           "Sphingomonas",
+                           "Elizabethkingia",
+                           "Bradyrhizobium",
+                           "Marixanthomonas",
+                           "Azonexus"))
+psmelt(diff_taxa_samples) %>% 
+  dplyr::select(Genus,east_west,Abundance) %>% 
+  mutate(east_west = factor(east_west,levels=c("West","East"))) %>% 
+  ggplot(aes(x=Genus,y=Abundance,fill=east_west)) +
+  scale_fill_manual(values = pal.discrete) +
+  geom_boxplot() +
+  facet_wrap(~east_west,scales='free') +
+  coord_flip() +
+  labs(y="Relative abundance",fill = "Side of\nWallace's Line") +
+  theme(axis.text.y = element_text(face='bold.italic'),
+        legend.position = 'none') 
+ggsave("./output/figs/SI_Fig_relabund_of_diff_taxa.png",height = 4,width = 8)
+
+psmelt(diff_taxa_samples) %>% 
+  dplyr::select(Genus,east_west,Abundance) %>% 
+  mutate(east_west = factor(east_west,levels=c("West","East"))) %>% 
+  group_by(Genus,east_west) %>% 
+  summarize(mean_relabund = mean(Abundance),
+            max_relabund = max(Abundance))
+
+microbiome::meta(ps) %>% 
+  select(east_west) %>% 
+  bind_cols(sample_sums(diff_taxa_samples)) %>% 
+  ggplot(aes(x=east_west,y=diff_taxa_sample_sums)) +
+  geom_boxplot()
+
+microbiome::meta(ps) %>% 
+  select(east_west) %>% 
+  bind_cols(diff_taxa_sample_sums) %>%
+  group_by(east_west) %>% 
+  summarize(meansum=mean(diff_taxa_sample_sums))

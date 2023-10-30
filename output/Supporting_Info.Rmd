@@ -149,7 +149,7 @@ bbd %>%
   mutate(across(where(is.numeric),function(x){round(x,4)})) %>% 
   kable(caption = "SI Table 7a. BBDML model estimates from all significant ASVs (including ASV sequence).") %>% 
   kable_classic(lightable_options = 'striped') %>% 
-  scroll_box(height = 300)
+  scroll_box(height = "600px")
 
 
 ```
@@ -164,12 +164,27 @@ bbd %>%
   mutate(across(where(is.numeric),function(x){round(x,4)})) %>% 
   kable(caption = "SI Table 7b. BBDML model estimates from all significant genera (from corncob).") %>% 
   kable_classic(lightable_options = 'striped') %>% 
-  scroll_box(height = 300)
-
+  scroll_box(height = '600px')
+?scroll_box
 
 ```
 
 
+### Neutral Community Model
+
+
+ASVs (identified here by their Genus assignment) that had significant deviations (red dots) from the Sloan Neutral Community Model (error bars).
+
+```{r}
+knitr::include_graphics("../output/figs/neutral_model_predictions_and_sig_taxa.png")
+```
+
+
+### Relative abundance of differentially abundant taxa
+
+```{r}
+knitr::include_graphics("../output/figs/SI_Fig_relabund_of_diff_taxa.png")
+```
 
 
 <br>
@@ -183,10 +198,17 @@ Bacterial genera traits were pulled from BacDive.
 
 ## Cell size
 
-Table X: Trait information for significant genera
+Table S5: Trait information for significant genera
 
 ```{r}
 read_csv("./significant_taxa_traits_kh.csv") %>% 
+  dplyr::filter(genus %in% c("Mucilaginibacter",
+                           "Rhizobium",
+                           "Sphingomonas",
+                           "Elizabethkingia",
+                           "Bradyrhizobium",
+                           "Marixanthomonas",
+                           "Azonexus")) %>% 
   kableExtra::kable() %>% 
   kableExtra::kable_classic(lightable_options = 'hover')
 ```

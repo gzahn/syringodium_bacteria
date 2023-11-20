@@ -210,6 +210,9 @@ read_csv("./significant_taxa_traits_kh.csv") %>%
                            "Bradyrhizobium",
                            "Marixanthomonas",
                            "Azonexus")) %>% 
+  mutate(dominant = case_when(genus == "Elizabethkingia" ~ "East",
+                              TRUE ~ "West"),
+         shape = "rod") %>% 
   kableExtra::kable() %>% 
   kableExtra::kable_classic(lightable_options = 'hover')
 ```

@@ -186,6 +186,7 @@ knitr::include_graphics("../output/figs/neutral_model_predictions_and_sig_taxa.p
 knitr::include_graphics("../output/figs/SI_Fig_relabund_of_diff_taxa.png")
 ```
 
+*Note different x-axis scale for West and East facets*
 
 <br>
 

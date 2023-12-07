@@ -1,11 +1,6 @@
 ---
 title: "Supporting Information"
-output: 
-  html_document:
-    toc: yes
-    toc_depth: 1
-    toc_float:
-      collapsed: false
+output: rmdformats::downcute
 ---
 
 ```{r setup, include=FALSE}
@@ -61,7 +56,7 @@ unifrac_beta <- readRDS("../output/unifrac_betadiv_df.RDS") %>%
 ```{r}
 bray_beta %>% 
   kable(caption = "SI Table 2. Bray-Curtis PermANOVA. Bold indicates P-value less than 0.05") %>% 
-  kable_classic(lightable_options = 'striped') %>% 
+  kable_classic() %>% 
   row_spec(which(bray_beta$p.value < 0.05), bold = TRUE)
 ```
 
@@ -72,7 +67,7 @@ bray_beta %>%
 ```{r}
 unifrac_beta %>% 
   kable(caption = "SI Table 3. UniFrac PermANOVA. Bold indicates P-value less than 0.05") %>% 
-  kable_classic(lightable_options = 'striped') %>% 
+  kable_classic() %>% 
   row_spec(which(unifrac_beta$p.value < 0.05), bold = TRUE)
 ```
 
@@ -92,7 +87,7 @@ data.frame(
             sd = sd(dists)) %>% 
   mutate(across(where(is.numeric),function(x){round(x,4)})) %>% 
   kable(caption = "Table 4. Distance to centroid summaries for beta-dispersion.") %>% 
-  kable_classic(lightable_options = 'striped')
+  kable_classic()
 
 
 plot(betadisp)
@@ -112,7 +107,7 @@ ___
 ```{r}
 readRDS("../output/MRM_table.RDS") %>% 
   kable(caption = "SI Table 5. Call: MRM(asv_dist ~ haversine_dist,nperm=1000)") %>% 
-  kable_classic(lightable_options = 'striped')
+  kable_classic()
 ```
 
 
@@ -121,7 +116,7 @@ readRDS("../output/MRM_table.RDS") %>%
 ```{r}
 readRDS("../output/mantel_table.RDS") %>% 
   kable(caption = "SI Table 6. Mantel Test statistics.") %>% 
-  kable_classic(lightable_options = 'striped')
+  kable_classic()
 
 ```
 
@@ -148,7 +143,7 @@ bbd <- readRDS("../output/bbdml_significant_mod_tables_ASV.RDS")
 bbd %>% 
   mutate(across(where(is.numeric),function(x){round(x,4)})) %>% 
   kable(caption = "SI Table 7a. BBDML model estimates from all significant ASVs (including ASV sequence).") %>% 
-  kable_classic(lightable_options = 'striped') %>% 
+  kable_classic() %>% 
   scroll_box(height = "600px")
 
 
@@ -163,7 +158,7 @@ bbd <- readRDS("../output/bbdml_significant_mod_tables.RDS")
 bbd %>% 
   mutate(across(where(is.numeric),function(x){round(x,4)})) %>% 
   kable(caption = "SI Table 7b. BBDML model estimates from all significant genera (from corncob).") %>% 
-  kable_classic(lightable_options = 'striped') %>% 
+  kable_classic() %>% 
   scroll_box(height = '600px')
 ?scroll_box
 
@@ -175,7 +170,7 @@ bbd %>%
 
 ASVs (identified here by their Genus assignment) that had significant deviations (red dots) from the Sloan Neutral Community Model (error bars).
 
-```{r}
+```{r, out.width='500px',out.height='500px'}
 knitr::include_graphics("../output/figs/neutral_model_predictions_and_sig_taxa.png")
 ```
 
@@ -214,7 +209,7 @@ read_csv("./significant_taxa_traits_kh.csv") %>%
                               TRUE ~ "West"),
          shape = "rod") %>% 
   kableExtra::kable() %>% 
-  kableExtra::kable_classic(lightable_options = 'hover')
+  kableExtra::kable_classic()
 ```
 
 
@@ -233,7 +228,7 @@ dim_mod$formula
 dim_mod %>% 
   broom::tidy() %>% 
   kableExtra::kable() %>% 
-  kableExtra::kable_classic(lightable_options = 'hover')
+  kableExtra::kable_classic()
 ```
 
 <br>
@@ -257,7 +252,7 @@ Data extracted from [BacDive](https://bacdive.dsmz.de/)
 readRDS("./cell_morphology_data.RDS") %>% 
   select(-c(est_vol,est_surface_area)) %>% 
   kableExtra::kable() %>% 
-  kableExtra::kable_classic(lightable_options = "hover") %>% 
+  kableExtra::kable_material_dark(lightable_options = "hover") %>% 
   kableExtra::scroll_box(height = '600px')
 ```
 <br>
@@ -268,7 +263,7 @@ readRDS("./cell_morphology_data.RDS") %>%
 readxl::read_xlsx("../data/SI_Indo_Metadata_CorrectGPS.xlsx") %>% 
   dplyr::select(-Barcode) %>% 
   kableExtra::kable() %>% 
-  kableExtra::kable_classic(lightable_options = "hover") %>% 
+  kableExtra::kable_classic() %>% 
   kableExtra::scroll_box(height = '600px')
 ```
 

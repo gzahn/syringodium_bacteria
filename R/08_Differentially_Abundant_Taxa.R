@@ -41,10 +41,12 @@ set.seed(123)
 
 # LOAD DATA ####
 # Load cleaned phyloseq object
-ps <- readRDS("./output/clean_phyloseq_object.RDS")
+ps <- readRDS("./output/clean_phyloseq_object_silva.RDS")
+ps@phy_tree <- NULL
 
 # change order to west - east (since West feels more natural on left of plots)
 ps@sam_data$east_west <- factor(ps@sam_data$east_west,levels = c("West","East"))
+
 
 # merge taxa at genus level
 ps_genus <- ps %>% 
@@ -230,9 +232,7 @@ vip_taxa %>%
 
 # COMMON DIFFABUND TAXA ####
 # find taxa that were detected by all methods
-corncob_taxa <- sig_taxa %>% 
-  str_split("_") %>% 
-  map_chr(6)
+corncob_taxa <- sig_taxa
 
 # subset bbdml tests to just those found by multipatt as well
 new_bbdml_obj <- new_bbdml_obj[which(names(new_bbdml_obj) %in% indicspecies_taxa)]
@@ -245,7 +245,8 @@ vip_taxa <- lapply(vip_taxa, `length<-`, max(lengths(vip_taxa)))
 vip_taxa <- vip_taxa %>% 
   map_chr(6)
 new_bbdml_obj <- new_bbdml_obj[which(names(new_bbdml_obj) %in% vip_taxa)]
-
+# new_bbdml_obj <- new_bbdml_obj[which(names(new_bbdml_obj) != "Afipia")]
+# names(new_bbdml_obj) <- names(new_bbdml_obj) %>% str_replace( "Allorhizobium-Neorhizobium-Pararhizobium-Rhizobium","Rhizobium")
 new_bbdml_obj %>% names() %>% 
   saveRDS("./output/final_significant_taxa.RDS")
 new_bbdml_obj %>% 
@@ -324,11 +325,14 @@ p7 <- bbdml_plot_7 +
 
 
 
-
+fullplot <- 
 (p1 + p2) / (p3 + p4) / (p5 + p6) / (p7 + plot_spacer()) +
   plot_layout(guides = "collect") & 
   theme(legend.position = 'bottom')
 ggsave("./output/figs/differential_abundance_sig_taxa.png", height = 8, width = 10,dpi=300)
+ggsave(plot = fullplot, 
+       filename = "./output/figs/Figure_4.tiff", 
+       height = 8, width = 10,dpi=500,device = "tiff",units = "in",bg = 'white')
 
 # Abundance of diffabund taxa
 diff_taxa_samples <- 

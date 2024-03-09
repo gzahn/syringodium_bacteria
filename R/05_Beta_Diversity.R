@@ -74,8 +74,14 @@ unifrac_plot <- plot_ordination(ps,UFORD,color = "east_west") +
 
 bray_plot + unifrac_plot + 
   plot_layout(guides = "collect") & 
-  theme(legend.position = 'bottom')
+  theme(legend.position = 'bottom') +
+  theme(axis.title = element_text(face='bold',size=12),
+        strip.text = element_text(face='bold',size=14),
+        legend.title = element_text(face='bold',size=14),
+        legend.text = element_text(face='bold',size=12))
 ggsave("./output/figs/ordination_plots.png",dpi=300,height = 6, width = 12)
+ggsave("./output/figs/Figure_3.tiff",dpi=500,height = 6, width = 12)
+
 # PERMANOVA ####
 
 # specify model tables for Supplementary Info

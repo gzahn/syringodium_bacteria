@@ -13,6 +13,8 @@ data/SI_Indo_Metadata_CorrectGPS.xlsx
 data/filtN/
 data/raw/
 manuscript/
+taxonomy/
+
 
 # History files
 .Rhistory
@@ -25,3 +27,10 @@ manuscript/
 .Ruserdata
 .Renviron
 .Rproj.user
+output/figs/differential_abundance_sig_taxa.tiff
+output/figs/Figure_3.tiff
+.git/objects/pack/pack-85b4925e9f7e8aef05fb977c4eabd6470bbfc8f9.pack
+taxonomy/silva_nr99_v138.1_wSpecies_train_set.fa.gz
+taxonomy/silva_nr99_v138.1_train_set.fa.gz
+taxonomy/silva_species_assignment_v138.1.fa.gz
+data/MO_metadata_raw.RDS

@@ -24,13 +24,13 @@ Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’
 Correlation of Fixed Effects:
             (Intr)
 east_wstWst -0.645
-We fitted a linear mixed model (estimated using REML and nloptwrap optimizer) to predict Shannon with east_west (formula: Shannon
-~ east_west). The model included island as random effect (formula: ~1 | island). The model's total explanatory power is
-substantial (conditional R2 = 0.47) and the part related to the fixed effects alone (marginal R2) is of 0.01. The model's
-intercept, corresponding to east_west = East, is at 3.20 (95% CI [2.68, 3.72], t(188) = 12.03, p < .001). Within this model:
+We fitted a linear mixed model (estimated using REML and nloptwrap optimizer) to predict Shannon with east_west (formula: Shannon ~ east_west).
+The model included island as random effect (formula: ~1 | island). The model's total explanatory power is substantial (conditional R2 = 0.47)
+and the part related to the fixed effects alone (marginal R2) is of 0.01. The model's intercept, corresponding to east_west = East, is at 3.20
+(95% CI [2.68, 3.72], t(188) = 12.03, p < .001). Within this model:
 
-  - The effect of east west [West] is statistically non-significant and positive (beta = 0.23, 95% CI [-0.58, 1.04], t(188) = 0.56,
-p = 0.574; Std. beta = 0.24, 95% CI [-0.60, 1.08])
+  - The effect of east west [West] is statistically non-significant and positive (beta = 0.23, 95% CI [-0.58, 1.04], t(188) = 0.56, p = 0.574;
+Std. beta = 0.24, 95% CI [-0.60, 1.08])
 
-Standardized parameters were obtained by fitting the model on a standardized version of the dataset. 95% Confidence Intervals
-(CIs) and p-values were computed using a Wald t-distribution approximation.
+Standardized parameters were obtained by fitting the model on a standardized version of the dataset. 95% Confidence Intervals (CIs) and
+p-values were computed using a Wald t-distribution approximation.

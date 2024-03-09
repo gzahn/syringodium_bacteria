@@ -17,7 +17,7 @@ library(tidyverse); packageVersion("tidyverse")
 library(vegan); packageVersion("vegan")
 library(phyloseq); packageVersion("phyloseq")
 library(broom); packageVersion("broom")
-library(lmerTest,lib.loc = "/home/geoff/R/x86_64-pc-linux-gnu-library/4.2"); packageVersion("lmerTest")
+library(lmerTest); packageVersion("lmerTest")
 
 # functions
 source("./R/helper_functions.R")
@@ -27,7 +27,7 @@ source("./R/theme.R")
 options(scipen=999)
 
 # data
-ps <- readRDS("./output/clean_phyloseq_object.RDS")
+ps <- readRDS("./output/clean_phyloseq_object_silva.RDS")
 
 m <- microbiome::meta(ps)
 we <- m %>% 
@@ -45,10 +45,15 @@ plot_richness(ps,
               color="east_west") +
   labs(color="Side of\nWallace's Line",
        x="Island") +
-  theme(legend.title = element_text(hjust=.5),
-        legend.position = "bottom") +
+  theme(legend.title = element_text(hjust=.5,size=14),
+        legend.position = "bottom",
+        strip.text = element_text(face='bold',size=14),
+        axis.title = element_text(face='bold',size=14),
+        legend.text = element_text(face='bold',size=12)) +
   scale_color_manual(values=pal.discrete,breaks = c("West","East"))
 ggsave("./output/figs/alpha_diversity_east_west_island.png",dpi=300,
+       height = 4,width = 4)
+ggsave("./output/figs/Figure_2.tiff",dpi=500,
        height = 4,width = 4)
 
 # add metadata columns to alpha data frame

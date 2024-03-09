@@ -24,13 +24,13 @@ Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’
 Correlation of Fixed Effects:
             (Intr)
 east_wstWst -0.645
-We fitted a linear mixed model (estimated using REML and nloptwrap optimizer) to predict Observed with east_west (formula:
-Observed ~ east_west). The model included island as random effect (formula: ~1 | island). The model's total explanatory power is
-moderate (conditional R2 = 0.23) and the part related to the fixed effects alone (marginal R2) is of 0.01. The model's intercept,
-corresponding to east_west = East, is at 189.31 (95% CI [156.09, 222.53], t(188) = 11.24, p < .001). Within this model:
+We fitted a linear mixed model (estimated using REML and nloptwrap optimizer) to predict Observed with east_west (formula: Observed ~
+east_west). The model included island as random effect (formula: ~1 | island). The model's total explanatory power is moderate (conditional R2
+= 0.23) and the part related to the fixed effects alone (marginal R2) is of 0.01. The model's intercept, corresponding to east_west = East, is
+at 189.31 (95% CI [156.09, 222.53], t(188) = 11.24, p < .001). Within this model:
 
-  - The effect of east west [West] is statistically non-significant and positive (beta = 20.70, 95% CI [-30.76, 72.16], t(188) =
-0.79, p = 0.428; Std. beta = 0.24, 95% CI [-0.36, 0.85])
+  - The effect of east west [West] is statistically non-significant and positive (beta = 20.70, 95% CI [-30.76, 72.16], t(188) = 0.79, p = 0.428;
+Std. beta = 0.24, 95% CI [-0.36, 0.85])
 
-Standardized parameters were obtained by fitting the model on a standardized version of the dataset. 95% Confidence Intervals
-(CIs) and p-values were computed using a Wald t-distribution approximation.
+Standardized parameters were obtained by fitting the model on a standardized version of the dataset. 95% Confidence Intervals (CIs) and
+p-values were computed using a Wald t-distribution approximation.

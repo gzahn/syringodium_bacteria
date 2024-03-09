@@ -18,7 +18,6 @@ library(vegan); packageVersion("vegan")
 library(phyloseq); packageVersion("phyloseq")
 library(ggraph); packageVersion("ggraph")
 library(ggmap); packageVersion("ggmap")
-readLines("~/.Renviron")
 
 # functions
 source("./R/helper_functions.R")
@@ -28,7 +27,7 @@ source("./R/googlemap_styling.R")
 set.seed(666)
 
 # Load google maps API key from .Renviron and set map style
-ggmap::register_google(key = Sys.getenv("export APIKEY")) # Key kept private
+ggmap::register_google(key = Sys.getenv("APIKEY")) # Key kept private
 mapstyle <- rjson::fromJSON(file = "./R/mapstyle2.json") %>% # from JSON file exported from snazzymaps.com
   googlemap_json_to_string(.)
 
@@ -78,7 +77,6 @@ net <- make_network(ps %>%
                       transform_sample_counts(function(x){x/sum(x)}),
                     keep.isolates = TRUE,max.dist = 1-maxdist,distance = "bray")
 
-?make_network
 # overlay on map
 node.pos <- 
   data.frame(
@@ -137,6 +135,7 @@ ggmap::ggmap(area) +
   theme(legend.position = "bottom",
         axis.title = element_text(face="bold",size=12))
 ggsave("./output/figs/Location_Map.png",dpi=300,height = 6,width = 6)
+ggsave("./output/figs/Figure_1.tiff",dpi=500,height = 6,width = 6)
 
 wakatobi <- microbiome::meta(ps_island) %>% dplyr::filter(location=="Wakatobi")
 banggai <- microbiome::meta(ps_island) %>% dplyr::filter(location=="Banggai")

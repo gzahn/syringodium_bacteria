@@ -252,7 +252,7 @@ Data extracted from [BacDive](https://bacdive.dsmz.de/)
 readRDS("./cell_morphology_data.RDS") %>% 
   select(-c(est_vol,est_surface_area)) %>% 
   kableExtra::kable() %>% 
-  kableExtra::kable_material_dark(lightable_options = "hover") %>% 
+  kableExtra::kable_classic() %>% 
   kableExtra::scroll_box(height = '600px')
 ```
 <br>
